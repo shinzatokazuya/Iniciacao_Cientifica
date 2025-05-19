@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <style>
+        table {
+            border: 2px solid black;
+            border-collapse: collapse;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        td, th {
+                border: 2px solid black;
+        }
+
+
+
+    </style>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Rodada</th>
+                <th>Mandante</th>
+                <th>Placar</th>
+                <th>Visitante</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for jogo in jogos %}
+                <tr>
+                    <td>{{ jogo["data"] }}</td>
+                    <td>{{ jogo["rodada"] }}</td>
+                    <td>{{ jogo["mandante"] }}</td>
+                    <td>{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</td>
+                    <td>{{ jogo["visitante"] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Clube</th>
+                <th>Jogos</th>
+                <th>Pontos</th>
+                <th>Vitorias</th>
+                <th>Empates</th>
+                <th>Derrotas</th>
+                <th>GM</th>
+                <th>GC</th>
+                <th>SG</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classificacao in classificacoes %}
+                <tr>
+                    <td>{{ classificacao["clube"] }}</td>
+                    <td>{{ classificacao["total_jogos"] }}</td>
+                    <td><strong>{{ classificacao["pontos"] }}</strong></td>
+                    <td>{{ classificacao["vitorias"] }}</td>
+                    <td>{{ classificacao["empates"] }}</td>
+                    <td>{{ classificacao["derrotas"] }}</td>
+                    <td>{{ classificacao["gm"] }}</td>
+                    <td>{{ classificacao["gc"] }}</td>
+                    <td>{{ classificacao["sg"] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

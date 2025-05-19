@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <style>
+
+      table {
+        border: 2px solid black;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+
+      th, td {
+        border: 2px solid black;
+      }
+    </style>
+
+    <form action="/search" method="get">
+      <input autocomplete="off" autofocus name="q" placeholder="Clube" type="text">
+      <select name="data">
+        <option disabled selected value="">Ano</option>
+        {% for data in datas %}
+          <option value="{{ data }}">{{ data }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Pesquisar</button>
+    </form>
+
+    <div>
+      <h2 style="text-align: center;">Ranking geral do Campeoneato Brasileiro de 2003 - 2023</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Clube</th>
+            <th>Jogos</th>
+            <th>Pontos</th>
+            <th>Vitórias</th>
+            <th>Empates</th>
+            <th>Derrotas</th>
+            <th>GM</th>
+            <th>GC</th>
+            <th>SG</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ranking in rankings %}
+            <tr>
+              <td>{{ ranking["clube"] }}</td>
+              <td>{{ ranking["total_jogos"] }}</td>
+              <td><strong>{{ ranking["pontos"] }}</strong></td>
+              <td>{{ ranking["vitorias"] }}</td>
+              <td>{{ ranking["empates"] }}</td>
+              <td>{{ ranking["derrotas"] }}</td>
+              <td>{{ ranking["gm"] }}</td>
+              <td>{{ ranking["gc"] }}</td>
+              <td>{{ ranking["sg"] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+{% endblock %}
