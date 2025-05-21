@@ -1,7 +1,12 @@
 # app.py
+<<<<<<< HEAD
 from flask import Flask, render_template, jsonify, request, redirect
 from cs50 import SQL
 import sqlite3
+=======
+from flask import Flask, render_template, jsonify, request
+from cs50 import SQL
+>>>>>>> c9a10673712c188e8e20fa284ebb07c1eced6f17
 
 app = Flask(__name__)
 
@@ -127,6 +132,7 @@ def search():
                                         ORDER BY p.ano DESC, pontos DESC, sg DESC, gm DESC;
                                    """, ano, ano, ano, ano)
         return render_template("search.html", jogos=jogos, classificacoes=classificacoes)
+<<<<<<< HEAD
     return redirect("/")
 
 @app.route("/clube/<nome>")
@@ -140,3 +146,6 @@ def estatisticas(partida_id):
     gols = db.execute("SELECT * FROM gols WHERE partida_id = ?", partida_id)
     cartoes = db.execute("SELECT * FROM cartoes WHERE partida_id = ?", partida_id)
     return render_template("estatisticas.html", estatisticas=estat, gols=gols, cartoes=cartoes)
+=======
+    return render_template("search.html", jogos=[])
+>>>>>>> c9a10673712c188e8e20fa284ebb07c1eced6f17

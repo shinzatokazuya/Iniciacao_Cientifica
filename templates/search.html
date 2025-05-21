@@ -34,9 +34,15 @@
                 <tr>
                     <td>{{ jogo["data"] }}</td>
                     <td>{{ jogo["rodada"] }}</td>
+<<<<<<< HEAD
                     <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
                     <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
                     <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+=======
+                    <td>{{ jogo["mandante"] }}</td>
+                    <td>{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</td>
+                    <td>{{ jogo["visitante"] }}</td>
+>>>>>>> c9a10673712c188e8e20fa284ebb07c1eced6f17
                 </tr>
             {% endfor %}
         </tbody>
