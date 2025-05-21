@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <style>
+
+        table {
+            border: 2px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td, th {
+                border: 2px solid black;
+        }
+
+    </style>
+
+    <h2>Estatisticas da partida</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Clube</th>
+                <th>Chutes</th>
+                <th>Chute no Alvo</th>
+                <th>Posse de Bola</th>
+                <th>Faltas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in estatisticas %}
+
+                <tr>
+                    <td>{{ e["clube"] }}</td>
+                    <td>{{ e["chutes"] }}</td>
+                    <td>{{ e["chutes_no_alvo"] }}</td>
+                    <td>{{ e["posse_de_bola"] }}</td>
+                    <td>{{ e["faltas"] }}</td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Gols</h3>
+    <ul>
+        {% for gol in gols %}
+
+            <li>{{ gol["minuto"] }} - {{ gol["clube"] }} - {{ gol["atleta"] }} ({{ gol["tipo_de_gol"] }})</li>
+
+        {% endfor %}
+    </ul>
+
+    <h3>Cartões</h3>
+    <ul>
+        {% for cartao in cartoes %}
+
+            <li>{{ cartao["minuto"] }} - {{ cartao["clube"] }} - {{ cartao["atleta"] }} ({{ cartao["tipo_de_cartao"] }})</li>
+
+        {% endfor %}
+    </ul>
+
+{% endblock %}

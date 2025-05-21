@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h2>Jogos do {{ clube }}</h2>
+    <ul>
+        {% for jogo in jogos %}
+
+            <li>{{ jogo["data"] }} - <a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a> <a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a> <a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></li>
+
+        {% endfor %}
+    </ul>
+
+{% endblock %}
