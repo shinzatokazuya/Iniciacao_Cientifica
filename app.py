@@ -1,9 +1,6 @@
 # app.py
 from flask import Flask, render_template, jsonify, request, redirect
 from cs50 import SQL
-import sqlite3
-from flask import Flask, render_template, jsonify, request
-from cs50 import SQL
 
 app = Flask(__name__)
 
