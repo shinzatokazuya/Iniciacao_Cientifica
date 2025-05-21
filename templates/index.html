@@ -33,6 +33,7 @@
       <table>
         <thead>
           <tr>
+            <th>Posição</th>
             <th>Clube</th>
             <th>Jogos</th>
             <th>Pontos</th>
@@ -47,7 +48,8 @@
         <tbody>
           {% for ranking in rankings %}
             <tr>
-              <td>{{ ranking["clube"] }}</td>
+              <td>{{ ranking["posicao"] }}</td>
+              <td><a href="/clube/{{ ranking['clube'] }}">{{ ranking["clube"] }}</a></td>
               <td>{{ ranking["total_jogos"] }}</td>
               <td><strong>{{ ranking["pontos"] }}</strong></td>
               <td>{{ ranking["vitorias"] }}</td>

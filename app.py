@@ -46,6 +46,7 @@ def index():
                                     GROUP BY clube
                                 )
                                 SELECT
+                                ROW_NUMBER() OVER (ORDER BY SUM(p.pontos) DESC, SUM(p.vitorias) DESC, (SUM(p.gm) - SUM(p.gc)) DESC, SUM(p.gm) DESC) AS posicao,
                                 p.clube,
                                 t.total_jogos,
                                 SUM(p.pontos) AS pontos,
@@ -58,7 +59,7 @@ def index():
                                 FROM placares p
                                 JOIN total_jogos_clube t ON p.clube = t.clube
                                 GROUP BY p.clube
-                                ORDER BY pontos DESC, sg DESC, gm DESC;
+                                ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC;
                           """)
     return render_template("index.html", datas=DATAS, rankings=rankings)
 
@@ -111,6 +112,7 @@ def search():
                                         )
                                         SELECT
                                         p.ano,
+                                        ROW_NUMBER() OVER (PARTITION BY p.ano ORDER BY SUM(p.pontos) DESC, SUM(p.vitorias) DESC, (SUM(p.gm) - SUM(p.gc)) DESC, SUM(p.gm) DESC) AS posicao,
                                         p.clube,
                                         t.total_jogos,
                                         SUM(p.pontos) AS pontos,
@@ -123,9 +125,9 @@ def search():
                                         FROM placares_anuais p
                                         JOIN total_jogos_clube t ON p.clube = t.clube
                                         GROUP BY p.ano, p.clube
-                                        ORDER BY p.ano DESC, pontos DESC, sg DESC, gm DESC;
+                                        ORDER BY p.ano DESC, pontos DESC, vitorias DESC, sg DESC, gm DESC;
                                    """, ano, ano, ano, ano)
-        return render_template("search.html", jogos=jogos, classificacoes=classificacoes)
+        return render_template("search.html", jogos=jogos, classificacoes=classificacoes, q=q)
     return redirect("/")
 
 @app.route("/clube/<nome>")
