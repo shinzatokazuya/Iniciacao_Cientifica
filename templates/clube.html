@@ -6,11 +6,6 @@
         <h2>Jogos do {{ clube }}</h2>
     </div>
 
-    <div class="chart-container">
-        <h3>Evolução da Posição do {{ clube }} por Rodada</h3>
-        <canvas id="posicaoChart"></canvas>
-    </div>
-
     <ul class="clube-jogos-list">
         {% for jogo in jogos %}
 
@@ -19,5 +14,5 @@
         {% endfor %}
     </ul>
 
-    
+
 {% endblock %}
