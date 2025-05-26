@@ -9,7 +9,7 @@ db = SQL("sqlite:///Dados_brasileirao_2003_2023.db")
 CLUBES_QUERY = db.execute("SELECT DISTINCT mandante AS clube FROM Full UNION SELECT DISTINCT visitante AS clube FROM Full ORDER BY clube")
 CLUBES = [row['clube'] for row in CLUBES_QUERY] # Extrai apenas os nomes dos clubes
 
-DATAS = ['2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023']
+DATAS = list(range(2003, 2023))
 
 @app.route("/")
 def index():
