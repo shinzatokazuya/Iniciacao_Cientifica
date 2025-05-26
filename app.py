@@ -144,3 +144,5 @@ def estatisticas(partida_id):
     gols = db.execute("SELECT * FROM Gols WHERE partida_id = ?", partida_id)
     cartoes = db.execute("SELECT * FROM Cartoes WHERE partida_id = ?", partida_id)
     return render_template("estatisticas.html", estatisticas=estat, gols=gols, cartoes=cartoes)
+
+

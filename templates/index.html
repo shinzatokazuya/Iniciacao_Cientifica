@@ -2,51 +2,6 @@
 
 {% block body %}
 
-    <style>
-
-      table {
-        border: 2px solid black;
-        border-collapse: collapse;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-      }
-
-      th, td {
-        border: 2px solid black;
-      }
-
-      /* Add styles for autocomplete suggestions */
-      #autocomplete-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        border: 1px solid #ddd;
-        max-height: 150px;
-        overflow-y: auto;
-        position: absolute; /* Position relative to the input field */
-        background-color: white;
-        z-index: 1000; /* Ensure it's above other content */
-        width: calc(100% - 2px); /* Match input width, adjust for border */
-      }
-
-      #autocomplete-list li {
-        padding: 8px 10px;
-        cursor: pointer;
-      }
-
-      #autocomplete-list li:hover {
-        background-color: #f0f0f0;
-      }
-
-      /* Container for relative positioning of autocomplete list */
-      .autocomplete-container {
-        position: relative;
-        display: inline-block; /* To make it wrap the input and list */
-      }
-      
-    </style>
-
     <form action="/search" method="get">
       <div class="autocomplete-container">
       <input autocomplete="off" autofocus name="q" placeholder="Clube" type="text" id="clube">

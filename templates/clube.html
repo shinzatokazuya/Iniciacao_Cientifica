@@ -2,8 +2,16 @@
 
 {% block body %}
 
-    <h2>Jogos do {{ clube }}</h2>
-    <ul>
+    <div class="clube-info">
+        <h2>Jogos do {{ clube }}</h2>
+    </div>
+
+    <div class="chart-container">
+        <h3>Evolução da Posição do {{ clube }} por Rodada</h3>
+        <canvas id="posicaoChart"></canvas>
+    </div>
+
+    <ul class="clube-jogos-list">
         {% for jogo in jogos %}
 
             <li>{{ jogo["data"] }} - <a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a> <a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a> <a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></li>
@@ -11,4 +19,5 @@
         {% endfor %}
     </ul>
 
+    
 {% endblock %}
