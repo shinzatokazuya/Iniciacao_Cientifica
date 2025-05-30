@@ -16,7 +16,12 @@ table {
 }
 
 .rodadas {
-    margin-left: auto
+    margin-right: auto;
+}
+
+.tabela {
+    margin-left: auto;
+    
 }
 
 th, td {
