@@ -8,20 +8,25 @@ body {
 }
 
 /* Estilos gerais para tabelas */
-table {
+.classificacao-geral {
     border: 1px solid #ccc;
     border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.rodadas {
-    margin-right: auto;
+.container-tabelas-search {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 20px;
 }
 
-.tabela {
-    margin-left: auto;
-    
+.tabela-jogos, .tabela-classificacao {
+    flex-shrink: 0;
+
 }
 
 th, td {

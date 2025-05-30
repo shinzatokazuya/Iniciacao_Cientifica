@@ -2,65 +2,67 @@
 
 {% block body %}
 
-    <table class="rodadas">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Rodada</th>
-                <th>Mandante</th>
-                <th>Placar</th>
-                <th>Visitante</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for jogo in jogos %}
+    <div class="container-tabelas-search">
+        <table class="tabela-jogos">
+            <thead>
                 <tr>
-                    <td>{{ jogo["data"] }}</td>
-                    <td>{{ jogo["rodada"] }}</td>
-                    <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
-                    <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
-                    <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+                    <th>Data</th>
+                    <th>Rodada</th>
+                    <th>Mandante</th>
+                    <th>Placar</th>
+                    <th>Visitante</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for jogo in jogos %}
+                    <tr>
+                        <td>{{ jogo["data"] }}</td>
+                        <td>{{ jogo["rodada"] }}</td>
+                        <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
+                        <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
+                        <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <table class="tabela">
-        <thead>
-            <tr>
-                <th>Posição</th>
-                <th>Clube</th>
-                <th>Jogos</th>
-                <th>Pontos</th>
-                <th>Vitorias</th>
-                <th>Empates</th>
-                <th>Derrotas</th>
-                <th>GM</th>
-                <th>GC</th>
-                <th>SG</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for classificacao in classificacoes %}
+        <table class="tabela-classificacao">
+            <thead>
                 <tr>
-                    <td>{{ classificacao["posicao"] }}</td>
-                    <td>
-                        {% if classificacao["clube"]|lower == q|lower %}
-                        <a href="/clube/{{ classificacao['clube'] }}" style="background-color: yellow;">{{ classificacao["clube"] }}</a>
-                        {% else %}<a href="/clube/{{ classificacao['clube'] }}">{{ classificacao["clube"] }}</a>
-                        {% endif %}
-                    </td>
-                    <td>{{ classificacao["total_jogos"] }}</td>
-                    <td><strong>{{ classificacao["pontos"] }}</strong></td>
-                    <td>{{ classificacao["vitorias"] }}</td>
-                    <td>{{ classificacao["empates"] }}</td>
-                    <td>{{ classificacao["derrotas"] }}</td>
-                    <td>{{ classificacao["gm"] }}</td>
-                    <td>{{ classificacao["gc"] }}</td>
-                    <td>{{ classificacao["sg"] }}</td>
+                    <th>Posição</th>
+                    <th>Clube</th>
+                    <th>Jogos</th>
+                    <th>Pontos</th>
+                    <th>Vitorias</th>
+                    <th>Empates</th>
+                    <th>Derrotas</th>
+                    <th>GM</th>
+                    <th>GC</th>
+                    <th>SG</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for classificacao in classificacoes %}
+                    <tr>
+                        <td>{{ classificacao["posicao"] }}</td>
+                        <td>
+                            {% if classificacao["clube"]|lower == q|lower %}
+                            <a href="/clube/{{ classificacao['clube'] }}" style="background-color: yellow;">{{ classificacao["clube"] }}</a>
+                            {% else %}<a href="/clube/{{ classificacao['clube'] }}">{{ classificacao["clube"] }}</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ classificacao["total_jogos"] }}</td>
+                        <td><strong>{{ classificacao["pontos"] }}</strong></td>
+                        <td>{{ classificacao["vitorias"] }}</td>
+                        <td>{{ classificacao["empates"] }}</td>
+                        <td>{{ classificacao["derrotas"] }}</td>
+                        <td>{{ classificacao["gm"] }}</td>
+                        <td>{{ classificacao["gc"] }}</td>
+                        <td>{{ classificacao["sg"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
