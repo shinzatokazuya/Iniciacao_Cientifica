@@ -11,10 +11,12 @@ body {
 table {
     border: 1px solid #ccc;
     border-collapse: collapse;
-    margin-left: auto;
-    margin-right: auto;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.rodadas {
+    margin-left: auto
 }
 
 th, td {
