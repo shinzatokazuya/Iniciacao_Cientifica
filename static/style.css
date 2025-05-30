@@ -13,7 +13,7 @@ body {
     border-collapse: collapse;
     margin-left: auto;
     margin-right: auto;
-    background-color: #fff;
+    background-color: #f3f7fa;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -22,11 +22,12 @@ body {
     justify-content: space-around;
     align-items: flex-start;
     gap: 20px;
+    background-color: #f3f7fa;
 }
 
 .tabela-jogos, .tabela-classificacao {
     flex-shrink: 0;
-
+    background-color: #f3f7fa;
 }
 
 th, td {
