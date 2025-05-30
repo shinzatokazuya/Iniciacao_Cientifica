@@ -199,21 +199,3 @@ form button:hover {
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
-
-/* Media Queries para responsividade */
-@media (max-width: 768px) {
-    .search-results-container {
-        flex-direction: column; /* Empilha as tabelas em telas menores */
-        align-items: center; /* Centraliza os itens empilhados */
-    }
-
-    .jogos-table-container,
-    .classificacao-table-container {
-        max-width: 95%; /* Ocupa quase toda a largura em telas menores */
-        min-width: unset; /* Remove a largura mínima */
-    }
-
-    .chart-container {
-        width: 95%; /* Ajusta a largura do gráfico para telas menores */
-    }
-}
