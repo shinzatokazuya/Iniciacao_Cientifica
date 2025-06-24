@@ -9,7 +9,7 @@ db = SQL("sqlite:///Dados_brasileirao_2003_2023.db")
 CLUBES_QUERY = db.execute("SELECT DISTINCT mandante AS clube FROM Full UNION SELECT DISTINCT visitante AS clube FROM Full ORDER BY clube")
 CLUBES = [row['clube'] for row in CLUBES_QUERY] # Extrai apenas os nomes dos clubes
 
-DATAS = list(range(2003, 2023))
+DATAS = list(range(2003, 2024))
 
 @app.route("/")
 def index():
@@ -70,9 +70,9 @@ def index():
     primeiras_partidas = []
     if ultimo_ano:
         primeiras_partidas = db.execute("SELECT * FROM Full WHERE SUBSTR(7, 4) = ? ORDER BY rodada, data LIMIT 10", ultimo_ano)
-    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ultimo_ano=ano_atual)
+    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ano_atual=ultimo_ano)
 
-@app.route("")
+#@app.route("")
 
 @app.route("/search")
 def search():
