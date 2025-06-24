@@ -52,7 +52,29 @@
     </div>
 
     <div id="section-partidas">
-      <h2 style="text-align: center;">Jogos da Temporada <span id="primeiras_partidas"</h2>
+      <h2 style="text-align: center;">Jogos da Temporada <span id="ano_partidas">{{ ano_atual if ano_atual else "" }}</span></h2>
+      <table class="tabela-jogos">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Rodada</th>
+            <th>Mandante</th>
+            <th>Placar</th>
+            <th>Visitante</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-jogos-tbody">
+          {% for jogo in primeiras_partidas %}
+            <tr>
+              <td>{{ jogo["data"] }}</td>
+              <td>{{ jogo["rodada"] }}</td>
+              <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
+              <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a></td>
+              <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
     <script>
