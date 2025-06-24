@@ -2,13 +2,73 @@
 <html>
     <head>
         <meta name="viewport" content="initial-scale=1, width=device-width">
-        <title>jogos</title>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRzSmPjLZuYFs14L9v4aWchB0w/Ez/rZec=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjEML3rWJcS/J0F3X1y4m3g0e6h7gR4p4Fz0YJg1z4=" crossorigin="anonymous"></script>
+        <title>Brasileirão</title>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="../static/style.css">
+
+        <script>
+            window.ALL_CLUBS = {{ clubes_json | safe }};
+        </script>
     </head>
     <body>
-        {% block body %} {% endblock %}
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a href="/"><!-- Colocar algo !--></a>
+            </div>
+            <div class="navbar-search">
+                <form action="/search" method="get">
+                    <div class="autocomplete-container">
+                        <input autocomplete="off" autofocus name="q" placeholder="Buscar Clube" type="text" id="clube_nav">
+                        <ul id="autocomplete-list-nav"></ul>
+                    </div>
+                    <button type="submit">Pesquisar Clube</button>
+                </form>
+            </div>
+        </nav>
+
+        <main class="container">
+            {% block body %} {% endblock %}
+        </main>
+
+        <script>
+            // Script de autocompletar para o navbar
+            let inputNav = document.querySelector('#clube_nav');
+            let autocompleteListNav = document.querySelector('#autocomplete-list-nav');
+
+            if (inputNav && autocompleteListNav && typeof window.ALL_CLUBS !== 'undefined') {
+                inputNav.addEventListener('keyup', () => {
+                    let query = inputNav.value.toLowerCase();
+                    let html = '';
+                    if (query.length > 0) {
+                        const filteredClubs = window.ALL_CLUBS.filter(club => club.toLowerCase().startsWith(query));
+
+                        if (filteredClubs.length > 0) {
+                            for (let club of filteredClubs) {
+                                html += `<li onclick="selectClubNav('${club.replace(/'/g, "\\'")}')">${club}</li>`;
+                            }
+                        }
+                    }
+                    autocompleteListNav.innerHTML = html;
+                    autocompleteListNav.style.display = html ? 'block' : 'none';
+                });
+
+                function selectClubNav(clubName) {
+                    inputNav.value = clubName;
+                    autocompleteListNav.innerHTML = '';
+                    autocompleteListNav.style.display = 'none';
+                }
+
+                document.addEventListener('click', (event) => {
+                    if (!event.target.closest('.navbar-search .autocomplete-container')) {
+                        autocompleteListNav.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+        {% block scripts %}
+            {# Para scripts específicos de cada página #}
+        {% endblock %}
     </body>
 </html>

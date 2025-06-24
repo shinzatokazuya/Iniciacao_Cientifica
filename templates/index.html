@@ -2,202 +2,70 @@
 
 {% block body %}
 
-    <form action="/search" method="get">
-      <div class="autocomplete-container">
-      <input autocomplete="off" autofocus name="q" placeholder="Clube" type="text" id="clube">
-      <ul id="autocomplete-list"></ul> </div>
-      <select name="data" id="select-ano">
-        <option value="Ano">Ano</option>
-        {% for data in datas %}
-          <option value="{{ data }}" {% if data == ano_atual %}selected{% endif %}>{{ data }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit">Pesquisar</button>
-    </form>
-
-    <div>
-      <h2 style="text-align: center;">Ranking geral do Campeoneato Brasileiro de 2003 - 2023</h2>
-      <table class="classificacao-geral" id="tabela-classificacao">
-        <thead>
-          <tr>
-            <th>Posição</th>
-            <th>Clube</th>
-            <th>Jogos</th>
-            <th>Pontos</th>
-            <th>Vitórias</th>
-            <th>Empates</th>
-            <th>Derrotas</th>
-            <th>GM</th>
-            <th>GC</th>
-            <th>SG</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-classificacao-tbody">
-          {% for ranking in rankings %}
-            <tr>
-              <td>{{ ranking["posicao"] }}</td>
-              <td><a href="/clube/{{ ranking['clube'] }}">{{ ranking["clube"] }}</a></td>
-              <td>{{ ranking["total_jogos"] }}</td>
-              <td><strong>{{ ranking["pontos"] }}</strong></td>
-              <td>{{ ranking["vitorias"] }}</td>
-              <td>{{ ranking["empates"] }}</td>
-              <td>{{ ranking["derrotas"] }}</td>
-              <td>{{ ranking["gm"] }}</td>
-              <td>{{ ranking["gc"] }}</td>
-              <td>{{ ranking["sg"] }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div style="margin-top: 20px;">
+        <h2 style="text-align: center;">Ranking geral do Campeonato Brasileiro de 2003 - 2023</h2>
+        <table class="classificacao-geral" id="tabela-classificacao-geral">
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Clube</th>
+                    <th>Jogos</th>
+                    <th>Pontos</th>
+                    <th>Vitórias</th>
+                    <th>Empates</th>
+                    <th>Derrotas</th>
+                    <th>GM</th>
+                    <th>GC</th>
+                    <th>SG</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-classificacao-geral-tbody">
+                {% for ranking in rankings %}
+                <tr>
+                    <td>{{ ranking["posicao"] }}</td>
+                    <td><a href="{{ url_for('clube', nome=ranking['clube']) }}">{{ ranking["clube"] }}</a></td>
+                    <td>{{ ranking["total_jogos"] }}</td>
+                    <td><strong>{{ ranking["pontos"] }}</strong></td>
+                    <td>{{ ranking["vitorias"] }}</td>
+                    <td>{{ ranking["empates"] }}</td>
+                    <td>{{ ranking["derrotas"] }}</td>
+                    <td>{{ ranking["gm"] }}</td>
+                    <td>{{ ranking["gc"] }}</td>
+                    <td>{{ ranking["sg"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <div id="section-partidas">
-      <h2 style="text-align: center;">Jogos da Temporada <span id="ano-partidas">{{ ano_atual if ano_atual else "" }}</span></h2>
-      <table class="tabela-jogos">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Rodada</th>
-            <th>Mandante</th>
-            <th>Placar</th>
-            <th>Visitante</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-jogos-tbody">
-          {% for jogo in primeiras_partidas %}
-            <tr>
-              <td>{{ jogo["data"] }}</td>
-              <td>{{ jogo["rodada"] }}</td>
-              <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
-              <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a></td>
-              <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div style="text-align: center; margin-top: 30px;">
+        <h3>Ver classificação e jogos por ano:</h3>
+        <select name="select-ano-index" id="select-ano-index">
+            <option disabled selected value="">Selecione um Ano</option>
+            {% for year in datas %}
+                <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
     </div>
 
-    <script>
+{% endblock %}
 
-      const ALL_CLUBS = {{ clubes_json | tojson }}; // This line is crucial
+{% block scripts %}
+<script>
+    // Define ALL_CLUBS globalmente para o autocomplete do navbar
+    const ALL_CLUBS = {{ clubes_json | safe }}; // Use |safe para evitar escape HTML
 
-      let input = document.querySelector('#clube');
-      let autocompleteList = document.querySelector('#autocomplete-list');
-      let yearSelect = document.querySelector('#select-ano');
-      let classificationTableBody = document.querySelector('#tabela-classificacao-tbody');
-      let matchesTableBody = document.querySelector('#tabela-jogos-tbody');
-      let rankingTitle = document.querySelector('h2:first-of-type');
-      let matchesYearSpan = document.querySelector('#ano-partidas');
+    document.addEventListener('DOMContentLoaded', () => {
+        const yearSelectIndex = document.querySelector('#select-ano-index');
 
-      input.addEventListener('keyup', () => {
-        let query = input.value.toLowerCase();
-        let html = '';
-        if (query.length > 0) {
-          const filteredClubs = ALL_CLUBS.filter(club => club.toLowerCase().startsWith(query));
-
-          if (filteredClubs.length > 0) {
-            for (let club of filteredClubs) {
-              html += `<li onclick="selectClub('${club.replace(/'/g, "\\'")}')">${club}</li>`;
-            }
-          }
+        if (yearSelectIndex) {
+            yearSelectIndex.addEventListener('change', () => {
+                const selectedYear = yearSelectIndex.value;
+                if (selectedYear) {
+                    window.location.href = `/search?data=${selectedYear}`;
+                }
+            });
         }
-        autocompleteList.innerHTML = html;
-        autocompleteList.style.display = html ? 'block' : 'none';
-      });
-
-      function selectClub(clubName) {
-        input.value = clubName;
-        autocompleteList.innerHTML = '';
-        autocompleteList.style.display = 'none';
-      }
-
-      document.addEventListener('click', (event) => {
-        if (!event.target.closest('.autocomplete-container')) {
-          autocompleteList.style.display = 'none';
-        }
-      });
-
-      // Event listener para seleção de ano
-      yearSelect.addEventListener('change', async () => {
-        const selectedYear = yearSelect.value;
-
-        // Se "Ano" (valor vazio) for selecionado, volta ao ranking geral
-        if (selectedYear === "") {
-          // Reverte o título do ranking para o geral
-          rankingTitle.textContent = "Ranking Geral do Campeonato Brasileiro (2003 - 2023)";
-          window.location.href = "/"; // Recarrega a página para o ranking geral
-          return; // Sai da função para evitar o restante do código
-        }
-
-        try {
-          // Atualiza o título do ranking para o ano selecionado
-          rankingTitle.textContent = `Ranking do Campeonato Brasileiro de ${selectedYear}`;
-          matchesYearSpan.textContent = selectedYear;
-
-          // Busca dados de classificação para o ano
-          const classificationResponse = await fetch(`/api/classificacao/${selectedYear}`);
-          const classificationData = await classificationResponse.json();
-          updateClassificationTable(classificationData);
-
-          // Busca dados dos jogos para o ano
-          const matchesResponse = await fetch(`/api/jogos/${selectedYear}`);
-          const matchesData = await matchesResponse.json();
-          updateMatchesTable(matchesData);
-
-        } catch (error) {
-          console.error('Erro ao buscar dados:', error);
-          // Opcionalmente, exibe uma mensagem de erro para o usuário
-          classificationTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Erro ao carregar classificação.</td></tr>`;
-          matchesTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Erro ao carregar jogos.</td></tr>`;
-        }
-      });
-
-      function updateClassificationTable(rankings) {
-        let html = '';
-        if (rankings.length > 0) {
-          for (let ranking of rankings) {
-            html += `
-              <tr>
-                <td>${ranking["posicao"]}</td>
-                <td><a href="/clube/${ranking['clube']}">${ranking["clube"]}</a></td>
-                <td>${ranking["total_jogos"]}</td>
-                <td><strong>${ranking["pontos"]}</strong></td>
-                <td>${ranking["vitorias"]}</td>
-                <td>${ranking["empates"]}</td>
-                <td>${ranking["derrotas"]}</td>
-                <td>${ranking["gm"]}</td>
-                <td>${ranking["gc"]}</td>
-                <td>${ranking["sg"]}</td>
-              </tr>
-            `;
-          }
-        } else {
-            html = `<tr><td colspan="10" style="text-align: center;">Nenhum dado de classificação disponível para este ano.</td></tr>`;
-        }
-        classificationTableBody.innerHTML = html;
-      }
-
-      function updateMatchesTable(jogos) {
-        let html = '';
-        if (jogos.length > 0) {
-          for (let jogo of jogos) {
-            html += `
-              <tr>
-                <td>${jogo["data"]}</td>
-                <td>${jogo["rodada"]}</td>
-                <td><a href="/clube/${jogo['mandante']}">${jogo["mandante"]}</a></td>
-                <td><a href="/estatisticas/${jogo['ID']}">${jogo["mandante_Placar"]} x ${jogo["visitante_Placar"]}</a></td>
-                <td><a href="/clube/${jogo['visitante']}">${jogo["visitante"]}</a></td>
-              </tr>
-            `;
-          }
-        } else {
-          html += `<tr><td colspan="5" style="text-align: center;">Nenhum jogo disponível para este ano.</td></tr>`;
-        }
-        matchesTableBody.innerHTML = html;
-      }
-
-    </script>
-
-
+    });
+</script>
 {% endblock %}
