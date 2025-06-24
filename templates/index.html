@@ -83,6 +83,11 @@
 
       let input = document.querySelector('#clube');
       let autocompleteList = document.querySelector('#autocomplete-list');
+      let yearSelect = document.querySelector('#select-ano');
+      let classificationTableBody = document.querySelector('#tabela-classificacao-tbody');
+      let matchesTableBody = document.querySelector('#matches-table-body');
+      let rankingTitle = document.querySelector('h2:first-of-type');
+      let matchesYearSpan = document.querySelector('#matches-year');
 
       input.addEventListener('keyup', () => {
         let query = input.value.toLowerCase();
