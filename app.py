@@ -7,14 +7,14 @@ app = Flask(__name__)
 db = SQL("sqlite:///Dados_brasileirao_2003_2023.db")
 
 CLUBES_QUERY = db.execute("SELECT DISTINCT mandante AS clube FROM Full UNION SELECT DISTINCT visitante AS clube FROM Full ORDER BY clube")
-CLUBES = [row['clube'] for row in CLUBES_QUERY] # Extrai apenas os nomes dos clubes
+CLUBES = [row['clube'] for row in CLUBES_QUERY]
 
-DATAS = list(range(2003, 2024))
+DATAS = list(range(2003, 2024)) # Inclui 2023
 
 @app.route("/")
 def index():
-    # RANKING GERAL (2003-2023)
-    rankings = db.execute("""
+    # Ranking geral (2003-2023)
+    rankings_geral = db.execute("""
                             WITH placares AS (
                                 SELECT
                                     mandante AS clube,
@@ -65,15 +65,21 @@ def index():
                                 GROUP BY p.clube
                                 ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC;
                           """)
-    # Jogo do ano mais recente para exibição padrão
-    ultimo_ano = max(DATAS) if DATAS else None
-    primeiras_partidas = []
-    if ultimo_ano:
-        primeiras_partidas = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY rodada, data", ultimo_ano)
-    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ano_atual=ultimo_ano)
 
-@app.route("/api/classificacao/<int:ano>")
-def get_classificacao_por_ano(ano):
+    # Jogos do ano mais recente (2023) para exibição padrão
+    latest_year = max(DATAS) if DATAS else None
+    initial_matches = []
+    if latest_year:
+        initial_matches = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY rodada, data", latest_year) # Removido LIMIT 10
+
+    return render_template("index.html", datas=DATAS, rankings=rankings_geral, clubes_json=CLUBES, initial_matches=initial_matches, current_year_matches=latest_year)
+
+
+@app.route("/api/classificacao/<int:year>") # Rota alterada para 'classificacao'
+def get_classification_by_year(year):
+    """
+    Retorna os dados de classificação para um determinado ano como JSON.
+    """
     rankings = db.execute("""
         WITH placares_anuais AS (
             SELECT
@@ -129,13 +135,16 @@ def get_classificacao_por_ano(ano):
         JOIN total_jogos_clube t ON p.clube = t.clube
         GROUP BY p.ano, p.clube
         ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC;
-    """, ano, ano, ano, ano)
+    """, year, year, year, year)
     return jsonify(rankings)
 
-@app.route("/api/jogos/<int:ano>")
-def get_jogos_por_ano(ano):
-    jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY rodada, data", ano)
-    return jsonify(jogos)
+@app.route("/api/jogos/<int:year>") # Rota alterada para 'jogos'
+def get_matches_by_year(year):
+    """
+    Retorna os dados dos jogos para um determinado ano como JSON.
+    """
+    matches = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY rodada, data", year)
+    return jsonify(matches)
 
 @app.route("/search")
 def search():
@@ -216,4 +225,5 @@ def estatisticas(partida_id):
     cartoes = db.execute("SELECT * FROM Cartoes WHERE partida_id = ?", partida_id)
     return render_template("estatisticas.html", estatisticas=estat, gols=gols, cartoes=cartoes)
 
-
+if __name__ == "__main__":
+    app.run(debug=True)
