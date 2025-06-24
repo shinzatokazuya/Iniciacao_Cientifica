@@ -24,7 +24,7 @@
     </div>
 
     <div class="container-tabelas-search">
-        <h2 id="classificacao-titulo">Classificação {% if ano_selecionado %}de {{ ano_selecionado }}{% if rodada_selecionada %} até a Rodada {{ rodada_selecionada }}{% endif %}{% endif %}</h2>
+        <h2 id="classificacao-titulo">Classificação {% if ano_selecionado %}{% if rodada_selecionada == 0 %}Final de {{ ano_selecionado }}{% elif rodada_selecionada %}de {{ ano_selecionado }} até a Rodada {{ rodada_selecionada }}{% endif %}{% endif %}</h2>
         <table class="tabela-classificacao" id="tabela-classificacao-anual">
             <thead>
                 <tr>
@@ -40,35 +40,33 @@
                     <th>SG</th>
                 </tr>
             </thead>
-            <tbody id="tabela-classificacao-tbody">
-                {# Conteúdo preenchido por Flask ou JavaScript #}
-                {% if classificacoes %}
-                    {% for classificacao in classificacoes %}
-                        <tr>
-                            <td>{{ classificacao["posicao"] }}</td>
-                            <td>
-                                <a href="{{ url_for('clube', nome=classificacao['clube']) }}"
-                                   {% if q and classificacao["clube"]|lower == q|lower %}style="background-color: yellow;"{% endif %}>
-                                    {{ classificacao["clube"] }}
-                                </a>
-                            </td>
-                            <td>{{ classificacao["total_jogos"] }}</td>
-                            <td><strong>{{ classificacao["pontos"] }}</strong></td>
-                            <td>{{ classificacao["vitorias"] }}</td>
-                            <td>{{ classificacao["empates"] }}</td>
-                            <td>{{ classificacao["derrotas"] }}</td>
-                            <td>{{ classificacao["gm"] }}</td>
-                            <td>{{ classificacao["gc"] }}</td>
-                            <td>{{ classificacao["sg"] }}</td>
-                        </tr>
-                    {% endfor %}
+            <tbody id="tabela-classificacao-anual-tbody">
+                {% if ano_selecionado %}
+                    {% if classificacoes %}
+                        {% for ranking in classificacoes %}
+                            <tr>
+                                <td>{{ ranking["posicao"] }}</td>
+                                <td><a href="/clube/{{ ranking['clube'] }}">{{ ranking["clube"] }}</a></td>
+                                <td>{{ ranking["total_jogos"] }}</td>
+                                <td><strong>{{ ranking["pontos"] }}</strong></td>
+                                <td>{{ ranking["vitorias"] }}</td>
+                                <td>{{ ranking["empates"] }}</td>
+                                <td>{{ ranking["derrotas"] }}</td>
+                                <td>{{ ranking["gm"] }}</td>
+                                <td>{{ ranking["gc"] }}</td>
+                                <td>{{ ranking["sg"] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="10" style="text-align: center;">Nenhuma classificação encontrada para o ano/rodada selecionada.</td></tr>
+                    {% endif %}
                 {% else %}
-                    <tr><td colspan="10" style="text-align: center;">Nenhum dado de classificação disponível.</td></tr>
+                    <tr><td colspan="10" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>
                 {% endif %}
             </tbody>
         </table>
 
-        <h2 id="jogos-titulo">Jogos {% if ano_selecionado %} de {{ ano_selecionado }}{% if rodada_selecionada %} - Rodada {{ rodada_selecionada }}{% endif %}{% endif %}</h2>
+        <h2 id="jogos-titulo">Jogos {% if ano_selecionado %}{% if rodada_selecionada == 0 %}de {{ ano_selecionado }}{% elif rodada_selecionada %}da Rodada {{ rodada_selecionada }} de {{ ano_selecionado }}{% endif %}{% endif %}</h2>
         <table class="tabela-jogos" id="tabela-jogos-anual">
             <thead>
                 <tr>
@@ -79,20 +77,23 @@
                     <th>Visitante</th>
                 </tr>
             </thead>
-            <tbody id="tabela-jogos-tbody">
-                {# Conteúdo preenchido por Flask ou JavaScript #}
-                {% if jogos %}
-                    {% for jogo in jogos %}
-                        <tr>
-                            <td>{{ jogo["data"] }}</td>
-                            <td>{{ jogo["rodada"] }}</td>
-                            <td><a href="{{ url_for('clube', nome=jogo['mandante']) }}">{{ jogo["mandante"] }}</a></td>
-                            <td><a href="{{ url_for('estatisticas', partida_id=jogo['ID']) }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
-                            <td><a href="{{ url_for('clube', nome=jogo['visitante']) }}">{{ jogo["visitante"] }}</a></td>
-                        </tr>
-                    {% endfor %}
+            <tbody id="tabela-jogos-anual-tbody">
+                {% if ano_selecionado %}
+                    {% if jogos %}
+                        {% for jogo in jogos %}
+                            <tr>
+                                <td>{{ jogo["data"] }}</td>
+                                <td>{{ jogo["rodada"] }}</td>
+                                <td><a href="/clube/{{ jogo.mandante }}">{{ jogo["mandante"] }}</a></td>
+                                <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
+                                <td><a href="/clube/{{ jogo.visitante }}">{{ jogo["visitante"] }}</a></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="5" style="text-align: center;">Nenhum jogo encontrado para o ano/rodada selecionada.</td></tr>
+                    {% endif %}
                 {% else %}
-                    <tr><td colspan="5" style="text-align: center;">Nenhum jogo disponível.</td></tr>
+                    <tr><td colspan="5" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>
                 {% endif %}
             </tbody>
         </table>
@@ -102,95 +103,121 @@
 
 {% block scripts %}
 <script>
+    // Define ALL_CLUBS globalmente para o autocomplete do navbar
+    const ALL_CLUBS = {{ clubes_json | safe }};
+
     document.addEventListener('DOMContentLoaded', () => {
         const selectAnoSearch = document.querySelector('#select-ano-search');
         const selectRodadaSearch = document.querySelector('#select-rodada-search');
-        const tabelaClassificacaoTbody = document.querySelector('#tabela-classificacao-tbody');
-        const tabelaJogosTbody = document.querySelector('#tabela-jogos-tbody');
+        const tabelaClassificacaoTbody = document.querySelector('#tabela-classificacao-anual-tbody');
+        const tabelaJogosTbody = document.querySelector('#tabela-jogos-anual-tbody');
         const anoSelecionadoHeader = document.querySelector('#classificacao-titulo');
         const jogosAnoHeader = document.querySelector('#jogos-titulo');
 
-        // Valores atuais vindos do Flask. Usamos 'tojson' para tratar null/None corretamente.
         let currentYear = {{ ano_selecionado | tojson }};
-        // Garante que currentRodada seja um número ou null, não uma string vazia se não vier da URL.
         let currentRodada = {{ rodada_selecionada | tojson }};
-        if (currentRodada === '') { // Caso o Flask passe string vazia por algum motivo
-            currentRodada = null;
-        }
 
-        // Função para preencher o dropdown de rodadas
+        console.log("DOM Loaded. Initial currentYear:", currentYear, "currentRodada:", currentRodada);
+
+        // Funções definidas no topo do escopo DOMContentLoaded
         async function populateRodadaDropdown(year, selectedRodada = null) {
-            selectRodadaSearch.innerHTML = '<option value="">Selecione a Rodada</option>'; // Limpa e adiciona opção default
+            console.log(`populateRodadaDropdown called for year: ${year}, selectedRodada: ${selectedRodada}`);
+
+            selectRodadaSearch.innerHTML = '<option value="">Selecione a Rodada</option>';
+            selectRodadaSearch.innerHTML += '<option value="0">Classificação Final / Todos os Jogos</option>';
+
             if (!year) {
                 selectRodadaSearch.style.display = 'none';
-                return;
+                console.log("No year selected. Hiding round dropdown.");
+                return 0;
             }
-            selectRodadaSearch.style.display = 'inline-block'; // Mostra o dropdown
+
+            let maxRodadaFromAPI = 0;
 
             try {
                 const response = await fetch(`/api/max_rodada/${year}`);
-                if (!response.ok) { // Verifica se a requisição foi bem-sucedida
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const maxRodada = await response.json();
+                console.log(`Fetch /api/max_rodada/${year} response status: ${response.status}`);
 
-                for (let i = 1; i <= maxRodada; i++) {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = `Rodada ${i}`;
-                    // Seleciona a rodada que veio do Flask ou a passada como argumento
-                    if (i === selectedRodada) {
-                         option.selected = true;
-                    }
-                    selectRodadaSearch.appendChild(option);
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar rodadas. Status: ' + response.status);
                 }
+                maxRodadaFromAPI = await response.json();
+                console.log(`Max rodada received from API: ${maxRodadaFromAPI}`);
+
+                if (typeof maxRodadaFromAPI === 'number' && maxRodadaFromAPI > 0) {
+                    for (let i = 1; i <= maxRodadaFromAPI; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = `Rodada ${i}`;
+                        selectRodadaSearch.appendChild(option);
+                    }
+                    selectRodadaSearch.style.display = 'inline-block';
+                    console.log(`Successfully populated ${maxRodadaFromAPI} rounds.`);
+                } else {
+                    console.log(`maxRodadaFromAPI is not a positive number (${maxRodadaFromAPI}). No specific rounds added.`);
+                    selectRodadaSearch.style.display = 'inline-block';
+                }
+
+                let defaultSelection = null;
+                if (selectedRodada !== null && (selectedRodada === 0 || (maxRodadaFromAPI > 0 && selectedRodada <= maxRodadaFromAPI))) {
+                    defaultSelection = selectedRodada;
+                    console.log(`Defaulting to selectedRodada from URL/param: ${defaultSelection}`);
+                } else if (maxRodadaFromAPI > 0) {
+                    defaultSelection = maxRodadaFromAPI;
+                    console.log(`Defaulting to last round: ${defaultSelection}`);
+                } else {
+                    defaultSelection = "0";
+                    console.log(`Defaulting to 0 (final classification) as no rounds found: ${defaultSelection}`);
+                }
+
+                if (defaultSelection !== null && selectRodadaSearch.querySelector(`option[value="${defaultSelection}"]`)) {
+                    selectRodadaSearch.value = defaultSelection;
+                    console.log(`Dropdown value set to: ${selectRodadaSearch.value}`);
+                } else {
+                    selectRodadaSearch.value = "0";
+                    console.log(`Could not set dropdown value to ${defaultSelection}. Falling back to 0.`);
+                }
+
             } catch (error) {
-                console.error("Erro ao carregar max_rodada:", error);
-                // Opcional: mostrar uma mensagem de erro para o usuário
+                console.error('Error in populateRodadaDropdown:', error);
                 selectRodadaSearch.innerHTML = '<option value="">Erro ao carregar rodadas</option>';
+                selectRodadaSearch.style.display = 'inline-block';
             }
+            return maxRodadaFromAPI;
         }
 
-        // Função para atualizar as tabelas de classificação e jogos
         async function updateTables(year, rodada) {
-            if (!year) {
-                tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Nenhum ano selecionado.</td></tr>`;
-                tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum ano selecionado.</td></tr>`;
-                if (anoSelecionadoHeader) {
-                    anoSelecionadoHeader.textContent = `Classificação`;
+            console.log(`updateTables called for year: ${year}, rodada: ${rodada}`);
+            tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Carregando classificação...</td></tr>`;
+            tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Carregando jogos...</td></tr>`;
+
+            if (anoSelecionadoHeader) {
+                if (rodada === 0) {
+                    anoSelecionadoHeader.textContent = `Classificação Final de ${year}`;
+                } else {
+                    anoSelecionadoHeader.textContent = `Classificação de ${year} até a Rodada ${rodada}`;
                 }
-                if (jogosAnoHeader) {
-                    jogosAnoHeader.textContent = `Jogos`;
+            }
+            if (jogosAnoHeader) {
+                if (rodada === 0) {
+                    jogosAnoHeader.textContent = `Todos os Jogos de ${year}`;
+                } else {
+                    jogosAnoHeader.textContent = `Jogos da Rodada ${rodada} de ${year}`;
                 }
-                return;
             }
 
             try {
-                // Atualiza o cabeçalho da classificação
-                if (anoSelecionadoHeader) {
-                    anoSelecionadoHeader.textContent = `Classificação de ${year}`;
-                    if (rodada) {
-                        anoSelecionadoHeader.textContent += ` até a Rodada ${rodada}`;
-                    }
-                }
+                const classificacaoResponse = await fetch(`/api/classificacao/${year}/${rodada}`);
+                if (!classificacaoResponse.ok) throw new Error('Erro ao carregar classificação.');
+                const classificacoes = await classificacaoResponse.json();
 
-                // Fetch Classificação
-                // Envia 0 se rodada for null/undefined para indicar a classificação do ano completo
-                const classificacaoResponse = await fetch(`/api/classificacao/${year}/${rodada || 0}`);
-                if (!classificacaoResponse.ok) {
-                    throw new Error(`HTTP error! status: ${classificacaoResponse.status}`);
-                }
-                const classificacaoData = await classificacaoResponse.json();
-                let classificacaoHtml = '';
-                if (classificacaoData.length > 0) {
-                    for (let ranking of classificacaoData) {
-                        const clubeUrl = `/clube/${encodeURIComponent(ranking.clube)}`;
-                        const isSelectedClub = {{ q | tojson }} && ranking.clube.toLowerCase() === {{ q | tojson }}.toLowerCase();
-
-                        classificacaoHtml += `
+                tabelaClassificacaoTbody.innerHTML = '';
+                if (classificacoes.length > 0) {
+                    classificacoes.forEach(ranking => {
+                        const row = `
                             <tr>
                                 <td>${ranking.posicao}</td>
-                                <td><a href="${clubeUrl}" ${isSelectedClub ? 'style="background-color: yellow;"' : ''}>${ranking.clube}</a></td>
+                                <td><a href="/clube/${ranking.clube}">${ranking.clube}</a></td>
                                 <td>${ranking.total_jogos}</td>
                                 <td><strong>${ranking.pontos}</strong></td>
                                 <td>${ranking.vitorias}</td>
@@ -201,90 +228,104 @@
                                 <td>${ranking.sg}</td>
                             </tr>
                         `;
-                    }
+                        tabelaClassificacaoTbody.insertAdjacentHTML('beforeend', row);
+                    });
                 } else {
-                    classificacaoHtml = `<tr><td colspan="10" style="text-align: center;">Nenhum dado de classificação disponível para este ano/rodada.</td></tr>`;
-                }
-                tabelaClassificacaoTbody.innerHTML = classificacaoHtml;
-
-
-                // Atualiza o cabeçalho dos jogos
-                if (jogosAnoHeader) {
-                    jogosAnoHeader.textContent = `Jogos de ${year}`;
-                    if (rodada) {
-                        jogosAnoHeader.textContent += ` - Rodada ${rodada}`;
-                    }
+                    tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Nenhuma classificação encontrada.</td></tr>`;
                 }
 
-                // Fetch Jogos
-                // Envia 0 se rodada for null/undefined para indicar rodada 1
-                const jogosResponse = await fetch(`/api/jogos/${year}/${rodada || 1}`);
-                if (!jogosResponse.ok) {
-                    throw new Error(`HTTP error! status: ${jogosResponse.status}`);
-                }
-                const jogosData = await jogosResponse.json();
-                let jogosHtml = '';
-                if (jogosData.length > 0) {
-                    for (let jogo of jogosData) {
-                        const mandanteUrl = `/clube/${encodeURIComponent(jogo.mandante)}`;
-                        const visitanteUrl = `/clube/${encodeURIComponent(jogo.visitante)}`;
-                        const estatisticasUrl = `/estatisticas/${jogo.ID}`;
+                const jogosResponse = await fetch(`/api/jogos/${year}/${rodada}`);
+                if (!jogosResponse.ok) throw new Error('Erro ao carregar jogos.');
+                const jogos = await jogosResponse.json();
 
-                        jogosHtml += `
+                tabelaJogosTbody.innerHTML = '';
+                if (jogos.length > 0) {
+                    jogos.forEach(jogo => {
+                        const row = `
                             <tr>
                                 <td>${jogo.data}</td>
                                 <td>${jogo.rodada}</td>
-                                <td><a href="${mandanteUrl}">${jogo.mandante}</a></td>
-                                <td><a href="${estatisticasUrl}">${jogo.mandante_Placar} x ${jogo.visitante_Placar}</a></td>
-                                <td><a href="${visitanteUrl}">${jogo.visitante}</a></td>
+                                <td><a href="/clube/${jogo.mandante}">${jogo.mandante}</a></td>
+                                <td><a href="/estatisticas/${jogo.ID}">${jogo.mandante_Placar} x ${jogo.visitante_Placar}</a></td>
+                                <td><a href="/clube/${jogo.visitante}">${jogo.visitante}</a></td>
                             </tr>
                         `;
-                    }
+                        tabelaJogosTbody.insertAdjacentHTML('beforeend', row);
+                    });
                 } else {
-                    jogosHtml = `<tr><td colspan="5" style="text-align: center;">Nenhum jogo disponível para esta rodada.</td></tr>`;
+                    tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum jogo encontrado.</td></tr>`;
                 }
-                tabelaJogosTbody.innerHTML = jogosHtml;
 
             } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Erro ao carregar classificação. ${error.message}</td></tr>`;
-                tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Erro ao carregar jogos. ${error.message}</td></tr>`;
+                console.error('Erro ao buscar dados:', error);
+                tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Erro ao carregar dados da classificação.</td></tr>`;
+                tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Erro ao carregar dados dos jogos.</td></tr>`;
             }
         }
 
-        // Event Listeners
+        // Listener para mudança no dropdown de Ano
         selectAnoSearch.addEventListener('change', async () => {
             currentYear = selectAnoSearch.value;
-            currentRodada = null; // Reseta a rodada ao mudar o ano
-            selectRodadaSearch.value = ""; // Reseta o dropdown da rodada
-            await populateRodadaDropdown(currentYear);
-            await updateTables(currentYear, 1); // Carrega a rodada 1 ao mudar o ano
-            history.pushState(null, '', `/search?data=${currentYear}`);
+            currentRodada = null;
+
+            if (currentYear) {
+                const maxRodadaDoAno = await populateRodadaDropdown(currentYear, currentRodada);
+                if (maxRodadaDoAno > 0) {
+                    history.pushState(null, '', `/search?data=${currentYear}&rodada=${maxRodadaDoAno}`);
+                    await updateTables(currentYear, maxRodadaDoAno);
+                } else {
+                    history.pushState(null, '', `/search?data=${currentYear}`);
+                    await updateTables(currentYear, 0);
+                }
+            } else {
+                selectRodadaSearch.style.display = 'none';
+                tabelaClassificacaoTbody.innerHTML = `<tr><td colspan="10" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>`;
+                tabelaJogosTbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>`;
+                if (anoSelecionadoHeader) {
+                    anoSelecionadoHeader.textContent = `Classificação`;
+                }
+                if (jogosAnoHeader) {
+                    jogosAnoHeader.textContent = `Jogos`;
+                }
+                history.pushState(null, '', `/search`);
+            }
         });
 
+        // Listener para mudança no dropdown de Rodada
         selectRodadaSearch.addEventListener('change', async () => {
             currentRodada = selectRodadaSearch.value ? parseInt(selectRodadaSearch.value) : null;
-            if (currentRodada) {
+            if (currentYear && currentRodada !== null) {
                 await updateTables(currentYear, currentRodada);
-                history.pushState(null, '', `/search?data=${currentYear}&rodada=${currentRodada}`);
-            } else {
-                // Se "Selecione a Rodada" for escolhido, volta para a classificação do ano completo e rodada 1 dos jogos
-                await updateTables(currentYear, 0); // Passa 0 para API de classificação buscar ano completo
-                history.pushState(null, '', `/search?data=${currentYear}`);
+                if (currentRodada === 0) {
+                    history.pushState(null, '', `/search?data=${currentYear}`);
+                } else {
+                    history.pushState(null, '', `/search?data=${currentYear}&rodada=${currentRodada}`);
+                }
+            } else if (currentYear) {
+                 const maxRodadaDoAnoParaReset = await populateRodadaDropdown(currentYear, null);
+                 if (maxRodadaDoAnoParaReset > 0) {
+                    history.pushState(null, '', `/search?data=${currentYear}&rodada=${maxRodadaDoAnoParaReset}`);
+                    await updateTables(currentYear, maxRodadaDoAnoParaReset);
+                 } else {
+                    history.pushState(null, '', `/search?data=${currentYear}`);
+                    await updateTables(currentYear, 0);
+                 }
             }
         });
 
         // Chamada inicial ao carregar a página
         if (currentYear) {
-            populateRodadaDropdown(currentYear, currentRodada).then(() => {
-                // Se a rodada veio da URL e é válida, atualiza as tabelas para ela.
-                // Caso contrário, usa a rodada 1 como padrão.
-                if (currentRodada && selectRodadaSearch.querySelector(`option[value="${currentRodada}"]`)) {
-                    selectRodadaSearch.value = currentRodada;
-                    updateTables(currentYear, currentRodada);
+            populateRodadaDropdown(currentYear, currentRodada).then((maxRodadaFetched) => {
+                let initialRodadaToUse;
+                if (currentRodada !== null && (currentRodada === 0 || (maxRodadaFetched > 0 && currentRodada <= maxRodadaFetched))) {
+                    initialRodadaToUse = currentRodada;
+                } else if (maxRodadaFetched > 0) {
+                    initialRodadaToUse = maxRodadaFetched;
                 } else {
-                    updateTables(currentYear, 1); // Garante que algo seja exibido, Rodada 1 como default
+                    initialRodadaToUse = 0;
                 }
+                console.log(`Initial updateTables call with year: ${currentYear}, rodada: ${initialRodadaToUse}`);
+                updateTables(currentYear, initialRodadaToUse);
             });
         } else {
             selectRodadaSearch.style.display = 'none';

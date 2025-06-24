@@ -3,8 +3,8 @@
     <head>
         <meta name="viewport" content="initial-scale=1, width=device-width">
         <title>Brasileirão</title>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="../static/style.css">
 
@@ -15,7 +15,7 @@
     <body>
         <nav class="navbar">
             <div class="navbar-brand">
-                <a href="/"><!-- Colocar algo !--></a>
+                <a href="/"></a>
             </div>
             <div class="navbar-search">
                 <form action="/search" method="get">
@@ -23,19 +23,24 @@
                         <input autocomplete="off" autofocus name="q" placeholder="Buscar Clube" type="text" id="clube_nav">
                         <ul id="autocomplete-list-nav"></ul>
                     </div>
-                    <button type="submit">Pesquisar Clube</button>
+                    <button type="submit">Buscar</button>
                 </form>
+            </div>
+            <div class="navbar-links">
+                <a href="/">Home</a>
             </div>
         </nav>
 
         <main class="container">
-            {% block body %} {% endblock %}
+            {% block body %}{% endblock %}
         </main>
 
+        <footer>
+            </footer>
+
         <script>
-            // Script de autocompletar para o navbar
-            let inputNav = document.querySelector('#clube_nav');
-            let autocompleteListNav = document.querySelector('#autocomplete-list-nav');
+            const inputNav = document.querySelector('#clube_nav');
+            const autocompleteListNav = document.querySelector('#autocomplete-list-nav');
 
             if (inputNav && autocompleteListNav && typeof window.ALL_CLUBS !== 'undefined') {
                 inputNav.addEventListener('keyup', () => {
