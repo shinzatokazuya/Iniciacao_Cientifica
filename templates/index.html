@@ -125,25 +125,9 @@
         if (selectedYear === "") {
           // Reverte o título do ranking para o geral
           rankingTitle.textContent = "Ranking Geral do Campeonato Brasileiro (2003 - 2023)";
-
-          // Re-carrega o ranking geral (você precisaria de um endpoint para isso ou refazer a query JS)
-          // POR ENQUANTO, como não temos um endpoint para o ranking geral, vamos fazer uma requisição fictícia
-          // ou recarregar a página (menos ideal).
-          // Para este exemplo, faremos uma chamada a um endpoint que retorna o ranking geral.
-          // Se não houver um endpoint específico para o "ranking geral", a melhor opção seria recarregar a página ou
-          // ter uma lógica diferente para o ranking geral que não dependa do select.
-          // Para manter a funcionalidade AJAX, vamos assumir que existe um endpoint "/api/classification/geral"
-          // ou que você pode usar o mesmo endpoint "/api/classification/<year>" mas sem filtro de ano.
-          // COMO JÁ TEMOS O RANKING GERAL PASSADO NO INDEX.HTML, VAMOS REVERTER PARA O CONTEÚDO INICIAL
-          // OU BUSCAR DE UM NOVO ENDPOINT SE PRECISAR SER DINÂMICO
-
-          // Para simplificar, vamos recarregar a página para voltar ao estado inicial do ranking geral
-          // mas manter a atualização dos jogos.
-          // Se você quiser o ranking geral via AJAX, precisaria de um novo endpoint para isso.
           window.location.href = "/"; // Recarrega a página para o ranking geral
           return; // Sai da função para evitar o restante do código
         }
-
 
         try {
           // Atualiza o título do ranking para o ano selecionado
