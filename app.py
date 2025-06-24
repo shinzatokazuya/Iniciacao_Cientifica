@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 from cs50 import SQL
 
 app = Flask(__name__)
@@ -202,7 +202,7 @@ def search():
                                         ORDER BY p.ano DESC, pontos DESC, vitorias DESC, sg DESC, gm DESC;
                                    """, ano, ano, ano, ano)
         return render_template("search.html", jogos=jogos, classificacoes=classificacoes, q=q)
-    return redirect("/index.html")
+    return redirect("/")
 
 @app.route("/clube/<nome>")
 def clube(nome):
