@@ -202,7 +202,7 @@ def search():
                                         ORDER BY p.ano DESC, pontos DESC, vitorias DESC, sg DESC, gm DESC;
                                    """, ano, ano, ano, ano)
         return render_template("search.html", jogos=jogos, classificacoes=classificacoes, q=q)
-    return redirect("/")
+    return redirect("/index.html")
 
 @app.route("/clube/<nome>")
 def clube(nome):
