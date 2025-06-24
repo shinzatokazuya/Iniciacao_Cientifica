@@ -75,61 +75,63 @@ def index():
 @app.route("/api/classificacao/<int:ano>")
 def get_classificacao_por_ano(ano):
     rankings = db.execute("""
-        WITH placares_anuais AS (
-            SELECT
-                SUBSTR(data, 7, 4) AS ano,
-                mandante AS clube,
-                SUM(CASE WHEN mandante_Placar > visitante_Placar THEN 3 WHEN mandante_Placar = visitante_Placar THEN 1 ELSE 0 END) AS pontos,
-                SUM(CASE WHEN mandante_Placar > visitante_Placar THEN 1 ELSE 0 END) AS vitorias,
-                SUM(CASE WHEN mandante_Placar = visitante_Placar THEN 1 ELSE 0 END) AS empates,
-                SUM(CASE WHEN mandante_Placar < visitante_Placar THEN 1 ELSE 0 END) AS derrotas,
-                SUM(mandante_Placar) AS gm,
-                SUM(visitante_Placar) AS gc
-            FROM Full
-            WHERE SUBSTR(data, 7, 4) = ?
-            GROUP BY SUBSTR(data, 7, 4), mandante
-            UNION ALL
-            SELECT
-                SUBSTR(data, 7, 4) AS ano,
-                visitante AS clube,
-                SUM(CASE WHEN visitante_Placar > mandante_Placar THEN 3 WHEN visitante_Placar = mandante_Placar THEN 1 ELSE 0 END) AS pontos,
-                SUM(CASE WHEN visitante_Placar > mandante_Placar THEN 1 ELSE 0 END) AS vitorias,
-                SUM(CASE WHEN visitante_Placar = mandante_Placar THEN 1 ELSE 0 END) AS empates,
-                SUM(CASE WHEN visitante_Placar < mandante_Placar THEN 1 ELSE 0 END) AS derrotas,
-                SUM(visitante_Placar) AS gm,
-                SUM(mandante_Placar) AS gc
-            FROM Full
-            WHERE SUBSTR(data, 7, 4) = ?
-            GROUP BY SUBSTR(data, 7, 4), visitante
-        ),
-        total_jogos_clube AS (
-            SELECT
-                clube,
-                COUNT(*) AS total_jogos
-            FROM (
-                SELECT mandante AS clube FROM Full WHERE SUBSTR(data, 7, 4) = ?
-                UNION ALL
-                SELECT visitante AS clube FROM Full WHERE SUBSTR(data, 7, 4) = ?
-            ) AS todos_os_clubes
-            GROUP BY clube
-        )
-        SELECT
-            p.ano,
-            ROW_NUMBER() OVER (PARTITION BY p.ano ORDER BY SUM(p.pontos) DESC, SUM(p.vitorias) DESC, (SUM(p.gm) - SUM(p.gc)) DESC, SUM(p.gm) DESC) AS posicao,
-            p.clube,
-            t.total_jogos,
-            SUM(p.pontos) AS pontos,
-            SUM(p.vitorias) AS vitorias,
-            SUM(p.empates) AS empates,
-            SUM(p.derrotas) AS derrotas,
-            SUM(p.gm) AS gm,
-            SUM(p.gc) AS gc,
-            (SUM(p.gm) - SUM(p.gc)) AS sg
-        FROM placares_anuais p
-        JOIN total_jogos_clube t ON p.clube = t.clube
-        GROUP BY p.ano, p.clube
-        ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC;
-    """, ano, ano, ano, ano)
+                                    WITH placares_anuais AS (
+                                        SELECT
+                                            SUBSTR(data, 7, 4) AS ano,
+                                            mandante AS clube,
+                                            SUM(CASE WHEN mandante_Placar > visitante_Placar THEN 3 WHEN mandante_Placar = visitante_Placar THEN 1 ELSE 0 END) AS pontos,
+                                            SUM(CASE WHEN mandante_Placar > visitante_Placar THEN 1 ELSE 0 END) AS vitorias,
+                                            SUM(CASE WHEN mandante_Placar = visitante_Placar THEN 1 ELSE 0 END) AS empates,
+                                            SUM(CASE WHEN mandante_Placar < visitante_Placar THEN 1 ELSE 0 END) AS derrotas,
+                                            SUM(mandante_Placar) AS gm,
+                                            SUM(visitante_Placar) AS gc
+                                        FROM Full
+                                        WHERE SUBSTR(data, 7, 4) = ?
+                                        GROUP BY SUBSTR(data, 7, 4), mandante
+                                        UNION ALL
+                                        SELECT
+                                            SUBSTR(data, 7, 4) AS ano,
+                                            visitante AS clube,
+                                            SUM(CASE WHEN visitante_Placar > mandante_Placar THEN 3 WHEN visitante_Placar = mandante_Placar THEN 1 ELSE 0 END) AS pontos,
+                                            SUM(CASE WHEN visitante_Placar > mandante_Placar THEN 1 ELSE 0 END) AS vitorias,
+                                            SUM(CASE WHEN visitante_Placar = mandante_Placar THEN 1 ELSE 0 END) AS empates,
+                                            SUM(CASE WHEN visitante_Placar < mandante_Placar THEN 1 ELSE 0 END) AS derrotas,
+                                            SUM(visitante_Placar) AS gm,
+                                            SUM(mandante_Placar) AS gc
+                                        FROM Full
+                                        WHERE SUBSTR(data, 7, 4) = ?
+                                        GROUP BY SUBSTR(data, 7, 4), visitante
+                                        ),
+                                        total_jogos_clube AS (
+                                            SELECT
+                                                clube,
+                                                COUNT(*) AS total_jogos
+                                            FROM (
+                                                SELECT mandante AS clube FROM Full
+                                                WHERE SUBSTR(data, 7, 4) = ?
+                                                UNION ALL
+                                                SELECT visitante AS clube FROM Full
+                                                WHERE SUBSTR(data, 7, 4) = ?
+                                            ) AS todos_os_clubes
+                                            GROUP BY clube
+                                        )
+                                        SELECT
+                                        p.ano,
+                                        ROW_NUMBER() OVER (PARTITION BY p.ano ORDER BY SUM(p.pontos) DESC, SUM(p.vitorias) DESC, (SUM(p.gm) - SUM(p.gc)) DESC, SUM(p.gm) DESC) AS posicao,
+                                        p.clube,
+                                        t.total_jogos,
+                                        SUM(p.pontos) AS pontos,
+                                        SUM(p.vitorias) AS vitorias,
+                                        SUM(p.empates) AS empates,
+                                        SUM(p.derrotas) AS derrotas,
+                                        SUM(p.gm) AS gm,
+                                        SUM(p.gc) AS gc,
+                                        (SUM(p.gm) - SUM(p.gc)) AS sg
+                                        FROM placares_anuais p
+                                        JOIN total_jogos_clube t ON p.clube = t.clube
+                                        GROUP BY p.ano, p.clube
+                                        ORDER BY p.ano DESC, pontos DESC, vitorias DESC, sg DESC, gm DESC;
+                                   """, ano, ano, ano, ano)
     return jsonify(rankings)
 
 @app.route("/api/jogos/<int:ano>")
