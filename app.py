@@ -13,6 +13,7 @@ DATAS = list(range(2003, 2023))
 
 @app.route("/")
 def index():
+    # RANKING GERAL (2003-2023)
     rankings = db.execute("""
                             WITH placares AS (
                                 SELECT
@@ -64,7 +65,14 @@ def index():
                                 GROUP BY p.clube
                                 ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC;
                           """)
-    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES)
+    # Jogo do ano mais recente para exibição padrão
+    ultimo_ano = max(DATAS) if DATAS else None
+    primeiras_partidas = []
+    if ultimo_ano:
+        primeiras_partidas = db.execute("SELECT * FROM Full WHERE SUBSTR(7, 4) = ? ORDER BY rodada, data LIMIT 10", ultimo_ano)
+    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ano_atual=ultimo_ano)
+
+@app.route("")
 
 @app.route("/search")
 def search():
