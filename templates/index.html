@@ -9,7 +9,7 @@
       <select name="data" id="select-ano">
         <option value="Ano">Ano</option>
         {% for data in datas %}
-          <option value="{{ data }}" {% if data == ano_atual %}selected{% endif %}>{{ data }}</option>
+          <option value="{{ data }}" {% if data = ano_atual %}selected{% endif %}>{{ data }}</option>
         {% endfor %}
       </select>
       <button type="submit">Pesquisar</button>

@@ -70,7 +70,7 @@ def index():
     primeiras_partidas = []
     if ultimo_ano:
         primeiras_partidas = db.execute("SELECT * FROM Full WHERE SUBSTR(7, 4) = ? ORDER BY rodada, data LIMIT 10", ultimo_ano)
-    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ano_atual=ultimo_ano)
+    return render_template("index.html", datas=DATAS, rankings=rankings, clubes_json=CLUBES, primeiras_partidas=primeiras_partidas, ultimo_ano=ano_atual)
 
 @app.route("")
 
