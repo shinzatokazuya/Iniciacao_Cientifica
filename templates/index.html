@@ -17,7 +17,7 @@
 
     <div>
       <h2 style="text-align: center;">Ranking geral do Campeoneato Brasileiro de 2003 - 2023</h2>
-      <table class="classificacao-geral">
+      <table class="classificacao-geral" id="tabela-classificacao">
         <thead>
           <tr>
             <th>Posição</th>
@@ -32,7 +32,7 @@
             <th>SG</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tabela-classificacao-tbody">
           {% for ranking in rankings %}
             <tr>
               <td>{{ ranking["posicao"] }}</td>
@@ -49,6 +49,10 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <div id="section-jogos">
+      <h2 style="text-align: center;">Jogos da Temporada</h2>
     </div>
 
     <script>
