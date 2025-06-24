@@ -52,7 +52,7 @@
     </div>
 
     <div id="section-partidas">
-      <h2 style="text-align: center;">Jogos da Temporada <span id="ano_partidas">{{ ano_atual if ano_atual else "" }}</span></h2>
+      <h2 style="text-align: center;">Jogos da Temporada <span id="ano-partidas">{{ ano_atual if ano_atual else "" }}</span></h2>
       <table class="tabela-jogos">
         <thead>
           <tr>
@@ -87,7 +87,7 @@
       let classificationTableBody = document.querySelector('#tabela-classificacao-tbody');
       let matchesTableBody = document.querySelector('#tabela-jogos-tbody');
       let rankingTitle = document.querySelector('h2:first-of-type');
-      let matchesYearSpan = document.querySelector('#matches-year');
+      let matchesYearSpan = document.querySelector('#ano-partidas');
 
       input.addEventListener('keyup', () => {
         let query = input.value.toLowerCase();
