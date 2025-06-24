@@ -132,7 +132,10 @@ def get_classificacao_por_ano(ano):
     """, ano, ano, ano, ano)
     return jsonify(rankings)
 
-@app.route("api/jogos/<int:ano>")
+@app.route("/api/jogos/<int:ano>")
+def get_jogos_por_ano(ano):
+    jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY rodada, data", ano)
+    return jsonify(jogos)
 
 @app.route("/search")
 def search():
