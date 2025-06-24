@@ -6,18 +6,18 @@
       <div class="autocomplete-container">
       <input autocomplete="off" autofocus name="q" placeholder="Clube" type="text" id="clube">
       <ul id="autocomplete-list"></ul> </div>
-      <select name="data" id="year-select"> {# ID alterado para year-select para consistência #}
-        <option value="">Ano</option>
+      <select name="data" id="select-ano">
+        <option value="Ano">Ano</option>
         {% for data in datas %}
-          <option value="{{ data }}" {% if data == current_year_matches %}selected{% endif %}>{{ data }}</option> {# Variável alterada para current_year_matches #}
+          <option value="{{ data }}" {% if data == ano_atual %}selected{% endif %}>{{ data }}</option>
         {% endfor %}
       </select>
       <button type="submit">Pesquisar</button>
     </form>
 
     <div>
-      <h2 style="text-align: center;">Ranking Geral do Campeonato Brasileiro (2003 - 2023)</h2>
-      <table class="classificacao-geral" id="classification-table">
+      <h2 style="text-align: center;">Ranking geral do Campeoneato Brasileiro de 2003 - 2023</h2>
+      <table class="classificacao-geral" id="tabela-classificacao">
         <thead>
           <tr>
             <th>Posição</th>
@@ -32,7 +32,7 @@
             <th>SG</th>
           </tr>
         </thead>
-        <tbody id="classification-table-body">
+        <tbody id="tabela-classificacao-tbody">
           {% for ranking in rankings %}
             <tr>
               <td>{{ ranking["posicao"] }}</td>
@@ -51,43 +51,43 @@
       </table>
     </div>
 
-    <div id="matches-section">
-        <h2 style="text-align: center;">Jogos da Temporada <span id="matches-year">{{ current_year_matches if current_year_matches else "" }}</span></h2> {# ID e variável alterados #}
-        <table class="tabela-jogos">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Rodada</th>
-                    <th>Mandante</th>
-                    <th>Placar</th>
-                    <th>Visitante</th>
-                </tr>
-            </thead>
-            <tbody id="matches-table-body">
-                {% for jogo in initial_matches %} {# Variável alterada para initial_matches #}
-                    <tr>
-                        <td>{{ jogo["data"] }}</td>
-                        <td>{{ jogo["rodada"] }}</td>
-                        <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
-                        <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
-                        <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div id="section-partidas">
+      <h2 style="text-align: center;">Jogos da Temporada <span id="ano-partidas">{{ ano_atual if ano_atual else "" }}</span></h2>
+      <table class="tabela-jogos">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Rodada</th>
+            <th>Mandante</th>
+            <th>Placar</th>
+            <th>Visitante</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-jogos-tbody">
+          {% for jogo in primeiras_partidas %}
+            <tr>
+              <td>{{ jogo["data"] }}</td>
+              <td>{{ jogo["rodada"] }}</td>
+              <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
+              <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a></td>
+              <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
     <script>
 
-      const ALL_CLUBS = {{ clubes_json | tojson }};
+      const ALL_CLUBS = {{ clubes_json | tojson }}; // This line is crucial
 
       let input = document.querySelector('#clube');
       let autocompleteList = document.querySelector('#autocomplete-list');
-      let yearSelect = document.querySelector('#year-select'); {# Seleciona pelo ID correto #}
-      let classificationTableBody = document.querySelector('#classification-table-body');
-      let matchesTableBody = document.querySelector('#matches-table-body');
+      let yearSelect = document.querySelector('#select-ano');
+      let classificationTableBody = document.querySelector('#tabela-classificacao-tbody');
+      let matchesTableBody = document.querySelector('#tabela-jogos-tbody');
       let rankingTitle = document.querySelector('h2:first-of-type');
-      let matchesYearSpan = document.querySelector('#matches-year'); {# Seleciona pelo ID correto #}
+      let matchesYearSpan = document.querySelector('#ano-partidas');
 
       input.addEventListener('keyup', () => {
         let query = input.value.toLowerCase();
@@ -123,8 +123,10 @@
 
         // Se "Ano" (valor vazio) for selecionado, volta ao ranking geral
         if (selectedYear === "") {
-          window.location.href = "/"; // Recarrega a página para o ranking geral e jogos do ano mais recente
-          return;
+          // Reverte o título do ranking para o geral
+          rankingTitle.textContent = "Ranking Geral do Campeonato Brasileiro (2003 - 2023)";
+          window.location.href = "/"; // Recarrega a página para o ranking geral
+          return; // Sai da função para evitar o restante do código
         }
 
         try {
