@@ -135,12 +135,12 @@
           matchesYearSpan.textContent = selectedYear;
 
           // Busca dados de classificação para o ano
-          const classificationResponse = await fetch(`/api/classification/${selectedYear}`);
+          const classificationResponse = await fetch(`/api/classificacao/${selectedYear}`);
           const classificationData = await classificationResponse.json();
           updateClassificationTable(classificationData);
 
           // Busca dados dos jogos para o ano
-          const matchesResponse = await fetch(`/api/matches/${selectedYear}`);
+          const matchesResponse = await fetch(`/api/Full/${selectedYear}`);
           const matchesData = await matchesResponse.json();
           updateMatchesTable(matchesData);
 
