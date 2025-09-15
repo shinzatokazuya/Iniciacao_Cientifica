@@ -104,7 +104,7 @@
 {% block scripts %}
 <script>
     // Define ALL_CLUBS globalmente para o autocomplete do navbar
-    const ALL_CLUBS = {{ clubes_json | safe }};
+    window.ALL_CLUBS = {{ clubes_json | safe }};
 
     document.addEventListener('DOMContentLoaded', () => {
         const selectAnoSearch = document.querySelector('#select-ano-search');
@@ -237,6 +237,8 @@
                 const jogosResponse = await fetch(`/api/jogos/${year}/${rodada}`);
                 if (!jogosResponse.ok) throw new Error('Erro ao carregar jogos.');
                 const jogos = await jogosResponse.json();
+
+                console.log("Jogos recebidos da API:", jogos);
 
                 tabelaJogosTbody.innerHTML = '';
                 if (jogos.length > 0) {

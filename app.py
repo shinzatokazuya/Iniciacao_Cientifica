@@ -1,7 +1,8 @@
 # app.py
 import functools
 from flask import Flask, render_template, jsonify, request, redirect, g
-
+from collections import defaultdict
+from datetime import datetime
 from cs50 import SQL
 
 app = Flask(__name__)
@@ -99,14 +100,14 @@ def search():
 
     if q:
         # Lógica de busca por clube (já existente)
-        jogos_clube = db.execute("SELECT * FROM Full WHERE mandante = ? OR visitante = ? ORDER BY data DESC", q, q)
-        return render_template("clube.html", clube=q, jogos=jogos_clube)
+        jogos_clube, jogos_por_ano = get_jogos_por_clube(q)
+        return render_template("clube.html", clube=q, jogos=jogos_clube, jogos_por_ano=jogos_por_ano)
 
     elif ano:
         current_year = int(ano)
 
         # Buscar a rodada máxima para o ano
-        max_round_result = db.execute("SELECT MAX(rodada) AS max_r FROM Full WHERE SUBSTR(data, 7, 4) = ?", current_year)
+        max_round_result = db.execute("SELECT MAX(rodada) AS max_r FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ?", current_year)
         if max_round_result and max_round_result[0]['max_r'] is not None:
             max_round = max_round_result[0]['max_r']
         else:
@@ -117,16 +118,16 @@ def search():
             current_round = int(rodada_param)
             if current_round == 0: # 0 ainda será o sinal para classificação final e todos os jogos
                 classificacoes = get_classification_by_year_and_round(current_year, 0)
-                jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY data, rodada", current_year)
+                jogos = db.execute("SELECT * FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ? ORDER BY data, rodada", current_year)
             else:
                 classificacoes = get_classification_by_year_and_round(current_year, current_round)
-                jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? AND rodada = ? ORDER BY data", current_year, current_round)
+                jogos = db.execute("SELECT * FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ? AND rodada = ? ORDER BY data", current_year, current_round)
         else:
             # Se nenhuma rodada específica foi solicitada (ou rodada_param não é um número válido)
             # Define a rodada padrão como a última rodada (max_round) e busca os jogos dessa rodada.
             current_round = max_round
             classificacoes = get_classification_by_year_and_round(current_year, current_round)
-            jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? AND rodada = ? ORDER BY data", current_year, current_round)
+            jogos = db.execute("SELECT * FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ? AND rodada = ? ORDER BY data", current_year, current_round)
 
     return render_template("search.html",
                            classificacoes=classificacoes,
@@ -149,9 +150,9 @@ def api_classificacao(ano, rodada):
 def api_jogos(ano, rodada):
     """Retorna os jogos para um dado ano e rodada, ou todos os jogos se rodada for 0."""
     if rodada == 0:
-        jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? ORDER BY data, rodada", ano)
+        jogos = db.execute("SELECT * FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ? ORDER BY data, rodada", ano)
     else:
-        jogos = db.execute("SELECT * FROM Full WHERE SUBSTR(data, 7, 4) = ? AND rodada = ? ORDER BY data", ano, rodada)
+        jogos = db.execute("SELECT * FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ? AND rodada = ? ORDER BY data", ano, rodada)
     return jsonify(jogos)
 
 @app.route("/api/max_rodada/<int:ano>")
@@ -160,7 +161,7 @@ def api_max_rodada(ano):
     print(f"DEBUG: Requisição recebida para /api/max_rodada/{ano} (tipo: {type(ano)})")
 
     # Store the query for clarity in debug
-    query_string = "SELECT MAX(rodada) AS max_r FROM Full WHERE SUBSTR(data, 7, 4) = ?"
+    query_string = "SELECT MAX(rodada) AS max_r FROM Full WHERE CAST(SUBSTR(data, 7, 4) AS INTEGER) = ?"
     print(f"DEBUG: Executando query: {query_string} com parâmetro: {ano}")
 
     result = db.execute(query_string, ano)
@@ -177,17 +178,70 @@ def api_max_rodada(ano):
 
 @app.route("/estatisticas/<int:jogo_id>")
 def estatisticas(jogo_id):
-    """Mostra estatísticas detalhadas de uma partida."""
-    estatisticas_jogo = db.execute("SELECT * FROM Estatisticas WHERE ID = ?", jogo_id)
-    gols_jogo = db.execute("SELECT * FROM Gols WHERE ID_partida = ?", jogo_id)
-    cartoes_jogo = db.execute("SELECT * FROM Cartoes WHERE ID_partida = ?", jogo_id)
-    return render_template("estatisticas.html", estatisticas=estatisticas_jogo, gols=gols_jogo, cartoes=cartoes_jogo)
+    # Estatísticas, gols e cartões
+    estatisticas_jogo = db.execute("SELECT * FROM Estatisticas WHERE partida_id = ?", jogo_id)
+    gols_jogo = db.execute("SELECT * FROM Gols WHERE partida_id = ? ORDER BY minuto ASC", jogo_id)
+    cartoes_jogo = db.execute("SELECT * FROM Cartoes WHERE partida_id = ? ORDER BY CAST(SUBSTR(minuto, 1, INSTR(minuto, '+') - 1) AS INTEGER) ASC", jogo_id)
+
+    # Buscar dados do confronto na tabela Full
+    confronto = db.execute("SELECT mandante, visitante, mandante_Placar AS gols_mandante, formacao_mandante, visitante_Placar AS gols_visitante, formacao_visitante, data, arena, rodada, mandante_Estado FROM Full WHERE ID = ?", jogo_id)
+
+    if confronto:
+        confronto = confronto[0]  # transforma lista em dicionário
+    else:
+        confronto = {}
+
+    return render_template(
+        "estatisticas.html",
+        estatisticas=estatisticas_jogo,
+        gols=gols_jogo,
+        cartoes=cartoes_jogo,
+        confronto=confronto,
+    )
 
 @app.route("/clube/<string:nome>")
 def clube(nome):
-    """Mostra todos os jogos de um clube específico."""
-    jogos_clube = db.execute("SELECT * FROM Full WHERE mandante = ? OR visitante = ? ORDER BY data DESC", nome, nome)
-    return render_template("clube.html", clube=nome, jogos=jogos_clube)
+    jogos_clube, jogos_por_ano = get_jogos_por_clube(nome)
+    return render_template("clube.html", clube=nome, jogos_por_ano=jogos_por_ano)
+
+def get_jogos_por_clube(nome):
+    """Mostra todos os jogos de um clube específico, separados por ano."""
+    jogos_clube = db.execute(
+        "SELECT * FROM Full WHERE mandante = ? OR visitante = ? ORDER BY rodada ASC",
+        nome, nome
+    )
+
+    jogos_por_ano = {}
+    jogos_adicionados = set()  # para evitar duplicados
+
+    for jogo in jogos_clube:
+        # converte a data do banco para datetime
+        data_jogo = datetime.strptime(jogo["data"], "%d/%m/%Y")
+        ano_jogo = data_jogo.year
+
+        # Ajusta o ano da pandemia
+        if ano_jogo == 2021 and data_jogo <= datetime(2021, 2, 25):
+            ano_jogo = 2020
+
+        # Evita duplicados
+        jogo_id = jogo["ID"]
+        if jogo_id in jogos_adicionados:
+            continue
+        jogos_adicionados.add(jogo_id)
+
+        # Adiciona no dicionário por ano
+        if ano_jogo not in jogos_por_ano:
+            jogos_por_ano[ano_jogo] = []
+        jogos_por_ano[ano_jogo].append(jogo)
+
+    # Ordena os anos de forma decrescente
+    jogos_por_ano = dict(sorted(jogos_por_ano.items(), reverse=True))
+
+    # Ordena cada ano por rodada
+    for ano in jogos_por_ano:
+        jogos_por_ano[ano] = sorted(jogos_por_ano[ano], key=lambda x: x["rodada"])
+
+    return jogos_clube, jogos_por_ano
 
 def get_classification_by_year_and_round(year, round_num=None):
     """
@@ -201,7 +255,7 @@ def get_classification_by_year_and_round(year, round_num=None):
     params = []
 
     if year:
-        where_clause_parts.append("SUBSTR(data, 7, 4) = ?")
+        where_clause_parts.append("CAST(SUBSTR(data, 7, 4) AS INTEGER) = ?")
         params.append(year)
 
     if round_num is not None and round_num != 0:

@@ -1,0 +1,29 @@
+.jogos-container {
+    display: flex;
+    flex-wrap: wrap; /* permite quebrar linhas quando não couber horizontalmente */
+    justify-content: center; /* centraliza horizontalmente */
+    gap: 20px; /* espaço entre as tabelas */
+}
+
+.jogos-ano {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    background-color: #fff;
+    min-width: 300px;
+}
+
+.jogos-ano table {
+    border-collapse: collapse; /* junta as bordas das células */
+    width: 100%;
+}
+
+.jogos-ano th, .jogos-ano td {
+    border: 1px solid #ccc; /* define a borda das células */
+    padding: 5px 8px;
+    text-align: center;
+}
+
+.jogos-ano th {
+    background-color: #f2f2f2; /* cabeçalho com cor */
+}
