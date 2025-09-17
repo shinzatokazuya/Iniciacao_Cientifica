@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<div class="controls-container">
+    <h3>
+        Campeonato Brasileiro
+        {% if q %}Clube: {{ q }}{% endif %}
+        {% if ano_selecionado %} de {{ ano_selecionado }} {% endif %}
+    </h3>
 
-    <div class="controls-container" style="text-align: center; margin-bottom: 20px;">
-        <h3>Resultados para:
-            {% if q %}Clube: {{ q }}{% endif %}
-            {% if ano_selecionado %} Ano: {{ ano_selecionado }} {% endif %}
-        </h3>
-
-        {# Dropdown para seleção de Ano (se estiver na página de busca) #}
+    <div class="selects-container">
         <select id="select-ano-search">
             <option value="">Selecione outro Ano</option>
             {% for year in datas %}
@@ -16,15 +16,21 @@
             {% endfor %}
         </select>
 
-        {# Dropdown para seleção de Rodada (visível apenas se um ano estiver selecionado) #}
         <select id="select-rodada-search" {% if not ano_selecionado %}style="display: none;"{% endif %}>
             <option value="">Selecione a Rodada</option>
-            {# As opções de rodada serão preenchidas via JavaScript #}
         </select>
     </div>
+</div>
 
-    <div class="container-tabelas-search">
-        <h2 id="classificacao-titulo">Classificação {% if ano_selecionado %}{% if rodada_selecionada == 0 %}Final de {{ ano_selecionado }}{% elif rodada_selecionada %}de {{ ano_selecionado }} até a Rodada {{ rodada_selecionada }}{% endif %}{% endif %}</h2>
+<div class="container-tabelas-search">
+    <div class="table-section">
+        <h2 id="classificacao-titulo">Classificação
+            {% if ano_selecionado %}
+                {% if rodada_selecionada == 0 %} Final de {{ ano_selecionado }}
+                {% elif rodada_selecionada %} de {{ ano_selecionado }} até a Rodada {{ rodada_selecionada }}
+                {% endif %}
+            {% endif %}
+        </h2>
         <table class="tabela-classificacao" id="tabela-classificacao-anual">
             <thead>
                 <tr>
@@ -41,32 +47,19 @@
                 </tr>
             </thead>
             <tbody id="tabela-classificacao-anual-tbody">
-                {% if ano_selecionado %}
-                    {% if classificacoes %}
-                        {% for ranking in classificacoes %}
-                            <tr>
-                                <td>{{ ranking["posicao"] }}</td>
-                                <td><a href="/clube/{{ ranking['clube'] }}">{{ ranking["clube"] }}</a></td>
-                                <td>{{ ranking["total_jogos"] }}</td>
-                                <td><strong>{{ ranking["pontos"] }}</strong></td>
-                                <td>{{ ranking["vitorias"] }}</td>
-                                <td>{{ ranking["empates"] }}</td>
-                                <td>{{ ranking["derrotas"] }}</td>
-                                <td>{{ ranking["gm"] }}</td>
-                                <td>{{ ranking["gc"] }}</td>
-                                <td>{{ ranking["sg"] }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="10" style="text-align: center;">Nenhuma classificação encontrada para o ano/rodada selecionada.</td></tr>
-                    {% endif %}
-                {% else %}
-                    <tr><td colspan="10" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>
-                {% endif %}
+                <!-- conteúdo preenchido no backend ou via JS -->
             </tbody>
         </table>
+    </div>
 
-        <h2 id="jogos-titulo">Jogos {% if ano_selecionado %}{% if rodada_selecionada == 0 %}de {{ ano_selecionado }}{% elif rodada_selecionada %}da Rodada {{ rodada_selecionada }} de {{ ano_selecionado }}{% endif %}{% endif %}</h2>
+    <div class="table-section">
+        <h2 id="jogos-titulo">Jogos
+            {% if ano_selecionado %}
+                {% if rodada_selecionada == 0 %} de {{ ano_selecionado }}
+                {% elif rodada_selecionada %} da Rodada {{ rodada_selecionada }} de {{ ano_selecionado }}
+                {% endif %}
+            {% endif %}
+        </h2>
         <table class="tabela-jogos" id="tabela-jogos-anual">
             <thead>
                 <tr>
@@ -78,27 +71,11 @@
                 </tr>
             </thead>
             <tbody id="tabela-jogos-anual-tbody">
-                {% if ano_selecionado %}
-                    {% if jogos %}
-                        {% for jogo in jogos %}
-                            <tr>
-                                <td>{{ jogo["data"] }}</td>
-                                <td>{{ jogo["rodada"] }}</td>
-                                <td><a href="/clube/{{ jogo.mandante }}">{{ jogo["mandante"] }}</a></td>
-                                <td><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} x {{ jogo["visitante_Placar"] }}</a></td>
-                                <td><a href="/clube/{{ jogo.visitante }}">{{ jogo["visitante"] }}</a></td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="5" style="text-align: center;">Nenhum jogo encontrado para o ano/rodada selecionada.</td></tr>
-                    {% endif %}
-                {% else %}
-                    <tr><td colspan="5" style="text-align: center;">Selecione um ano acima para ver a classificação e jogos.</td></tr>
-                {% endif %}
+                <!-- conteúdo preenchido no backend ou via JS -->
             </tbody>
         </table>
     </div>
-
+</div>
 {% endblock %}
 
 {% block scripts %}

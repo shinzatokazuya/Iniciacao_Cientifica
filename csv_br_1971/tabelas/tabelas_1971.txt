@@ -1,0 +1,32 @@
+CREATE TABLE clubes (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    clube TEXT,
+    cidade TEXT,
+    UF TEXT,
+    regiao TEXT
+);
+
+CREATE TABLE campeonatos (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    campeonato TEXT,
+    pais TEXT,
+    entidade TEXT
+);
+
+CREATE TABLE partidas (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    data TEXT,
+    hora TEXT,
+    campeonato_id,
+    fase TEXT,
+    mandante_id INTEGER,
+    mandante_placar INTEGER,
+    visitante_placar INTEGER,
+    visitante_id INTEGER,
+    mandante_penalti INTEGER,
+    visitante_penalti INTEGER,
+    prorrogacao INTEGER DEFAULT 0,
+    FOREIGN KEY (mandante_id) REFERENCES clubes(ID),
+    FOREIGN KEY (visitante_id) REFERENCES clubes(ID),
+    FOREIGN KEY (campeonato_id) REFERENCES campeonatos(ID)
+);

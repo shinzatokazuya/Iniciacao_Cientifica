@@ -4,7 +4,7 @@
 
      <div style="text-align: center;">
         <h2>Campeonato Brasileiro</h2>
-        <h3>Ano:</h3>
+
         <select name="select-ano-index" id="select-ano-index">
             <option disabled selected value="">Selecione um Ano</option>
             {% for year in datas %}
@@ -17,9 +17,9 @@
         <h2 class="ranking-title">Ranking geral do Campeonato Brasileiro de 2003 - 2023</h2>
 
         <div class="rankings-container">
-            {% set chunk_size = 20 %}
+            {% set chunk_size = 15 %}
             {% for i in range(0, rankings|length, chunk_size) %}
-            <table class="ranking-table" id="tabela-classificacao-geral">
+            <table id="tabela-classificacao-geral">
                 <thead>
                     <tr>
                         <th>Posição</th>
@@ -59,6 +59,7 @@
 
 {% block scripts %}
 <script>
+
     // Define ALL_CLUBS globalmente para o autocomplete do navbar
     const ALL_CLUBS = {{ clubes_json | safe }}; // Use |safe para evitar escape HTML
 

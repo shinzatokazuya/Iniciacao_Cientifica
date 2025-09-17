@@ -41,3 +41,27 @@
 #autocomplete-list-nav li:first-child {
     border-top: none;
 }
+
+.navbar {
+    display: flex;
+    align-items: center;   /* centraliza verticalmente */
+    justify-content: space-between; /* espaço entre os itens */
+    padding: 10px 20px;
+}
+
+.navbar-search form {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-search input {
+    flex: 1;
+    padding: 6px 10px;
+}
+
+.navbar-links a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #333;
+}
+

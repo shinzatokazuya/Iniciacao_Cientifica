@@ -6,11 +6,12 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-        <link rel="stylesheet" href="../static/style.css">
-        <link rel="stylesheet" href="../static/layout.css">
-        <link rel="stylesheet" href="../static/index.css">
-        <link rel="stylesheet" href="../static/clube.css">
-        <link rel="stylesheet" href="../static/estatisticas.css">
+        <link rel="stylesheet" href="../static/css/style.css">
+        <link rel="stylesheet" href="../static/css/layout.css">
+        <link rel="stylesheet" href="../static/css/index.css">
+        <link rel="stylesheet" href="../static/css/clube.css">
+        <link rel="stylesheet" href="../static/css/estatisticas.css">
+        <link rel="stylesheet" href="../static/css/search.css">
 
         <script>
             window.ALL_CLUBS = {{ clubes_json | safe }};
@@ -42,58 +43,7 @@
         <footer>
             </footer>
 
-        <script>
-            const inputNav = document.querySelector('#clube_nav');
-            const autocompleteListNav = document.querySelector('#autocomplete-list-nav');
-
-            if (inputNav && autocompleteListNav && typeof window.ALL_CLUBS !== 'undefined') {
-
-                // Função para atualizar a lista
-                function updateAutocompleteList(query = '') {
-                    let html = '';
-                    let filteredClubs = window.ALL_CLUBS;
-
-                    if (query.length > 0) {
-                        filteredClubs = window.ALL_CLUBS.filter(club => club.toLowerCase().startsWith(query.toLowerCase()));
-                    }
-
-                    for (let club of filteredClubs) {
-                        html += `<li onclick="selectClubNav('${club.replace(/'/g, "\\'")}')">${club}</li>`;
-                    }
-
-                    autocompleteListNav.innerHTML = html;
-                    autocompleteListNav.style.display = html ? 'block' : 'none';
-                }
-
-                inputNav.addEventListener('keyup', () => {
-                    let query = inputNav.value.toLowerCase();
-                    let html = '';
-                    if (query.length > 0) {
-                        const filteredClubs = window.ALL_CLUBS.filter(club => club.toLowerCase().startsWith(query));
-
-                        if (filteredClubs.length > 0) {
-                            for (let club of filteredClubs) {
-                                html += `<li onclick="selectClubNav('${club.replace(/'/g, "\\'")}')">${club}</li>`;
-                            }
-                        }
-                    }
-                    autocompleteListNav.innerHTML = html;
-                    autocompleteListNav.style.display = html ? 'block' : 'none';
-                });
-
-                function selectClubNav(clubName) {
-                    inputNav.value = clubName;
-                    autocompleteListNav.innerHTML = '';
-                    autocompleteListNav.style.display = 'none';
-                }
-
-                document.addEventListener('click', (event) => {
-                    if (!event.target.closest('.navbar-search .autocomplete-container')) {
-                        autocompleteListNav.style.display = 'none';
-                    }
-                });
-            }
-        </script>
+        <script src="../static/js/layout.js"></script>
         {% block scripts %}
             {# Para scripts específicos de cada página #}
         {% endblock %}
