@@ -39,22 +39,16 @@ for row in cur_antigo.fetchall():
     ano = int(data[6:])
     edicao_id = edicoes_map[(campeonato_id, ano)]
 
-    # Junta data e hora em um datetime único
-    if hora:
-        data_hora = f"{data} {hora}"
-    else:
-        data_hora = data
-
     cur_novo.execute("""
         INSERT INTO partidas (
-            ID, edicao_id, estadio_id, data_hora, fase,
+            ID, edicao_id, estadio_id, data, hora, fase,
             mandante_id, visitante_id,
             mandante_placar, visitante_placar,
             mandante_penalti, visitante_penalti, prorrogacao
         )
-        VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-        id_partida, edicao_id, data_hora, fase,
+        id_partida, edicao_id, data, hora, fase,
         mandante_id, visitante_id,
         mandante_placar, visitante_placar,
         mandante_penalti, visitante_penalti, prorrogacao
