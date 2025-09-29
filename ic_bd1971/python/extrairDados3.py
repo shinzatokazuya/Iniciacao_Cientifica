@@ -18,7 +18,7 @@ con_novo.commit()
 
 # 2. Migrar estatisticas (Estatisticas -> estatisticas_partida)
 cur_antigo.execute("""
-    SELECT e.partida_id, e.rodada, e.clube, e.chutes, e.chutes_no_alvo,
+    SELECT e.partida_id, f.data, e.rodada, e.clube, e.chutes, e.chutes_no_alvo,
            e.posse_de_bola, e.passes, e.precisao_passes, e.faltas,
            e.cartao_amarelo, e.cartao_vermelho, e.impedimentos, e.escanteios
     FROM Estatisticas e
@@ -27,10 +27,16 @@ cur_antigo.execute("""
 estatisticas = cur_antigo.fetchall()
 
 for row in estatisticas:
-    partida_id, rodada, clube_nome, chutes, chutes_no_alvo, posse, passes, precisao, faltas, amarelo, vermelho, imped, escanteios = row
+    data_antiga, rodada, clube_nome, chutes, chutes_no_alvo, posse, passes, precisao, faltas, amarelo, vermelho, imped, escanteios = row
 
-    # Pega ID do clube no banco novo
-    cur_novo.execute("SELECT ID FROM clubes WHERE clube = ?", (clube_nome,))
+    # Pega pela correspondecia de data e nome do clube no banco novo
+    cur_novo.execute("""
+        SELECT p.id, c1.clube, c2.clube
+        FROM partidas p
+        JOIN clubes c1 ON p.mandante_id = c1.id
+        JOIN clubes c2 ON p.visitante_id = c2.id
+        WHERE DATE(p.data_hora) = ?
+    """, (data_antiga,))
     resultado = cur_novo.fetchone()
     if resultado is None:
         print(f"Clube não encontrado: {clube_nome}")
