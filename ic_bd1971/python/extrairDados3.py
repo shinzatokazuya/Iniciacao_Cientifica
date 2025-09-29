@@ -18,7 +18,7 @@ con_novo.commit()
 
 # 2. Migrar estatisticas (Estatisticas -> estatisticas_partida)
 cur_antigo.execute("""
-    SELECT e.partida_id, f.data, e.rodada, e.clube, e.chutes, e.chutes_no_alvo,
+    SELECT e.partida_id, f.data, e.clube, e.chutes, e.chutes_no_alvo,
            e.posse_de_bola, e.passes, e.precisao_passes, e.faltas,
            e.cartao_amarelo, e.cartao_vermelho, e.impedimentos, e.escanteios
     FROM Estatisticas e
