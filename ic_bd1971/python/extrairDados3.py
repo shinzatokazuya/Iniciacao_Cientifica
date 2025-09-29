@@ -1,10 +1,10 @@
 import sqlite3
 
 # Conecta com banco de dados
-con_antigo = sqlite3.connect("/workspaces/Iniciacao_Cientifica/Dados_brasileirao_2003_2023")
+con_antigo = sqlite3.connect("../../ic_bd2003/bd/Dados_brasileirao_2003_2023")
 cur_antigo = con_antigo.cursor()
 
-con_novo = sqlite3.connect("/workspaces/Iniciacao_Cientifica/ic_bd1971/bd/dados_teste_1971.db")
+con_novo = sqlite3.connect("../bd/dados_teste_1971.db")
 cur_novo = con_novo.cursor()
 
 # 1. Migrar estádios (arena -> estadios)
