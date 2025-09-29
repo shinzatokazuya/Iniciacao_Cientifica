@@ -14,7 +14,7 @@ partidas_antigas = cur_antigo.fetchall()
 
 edicoes_map = {}
 for _, campeonato_id, data in partidas_antigas:
-    ano = int(data[6:])
+    ano = int(data.split("/")[-1]) # Pega o ano (ex.: "31/07/1971" -> 1971)
     chave = (campeonato_id, ano)
     if chave not in edicoes_map:
         cur_novo.execute("""
