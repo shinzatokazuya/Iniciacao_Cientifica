@@ -27,7 +27,7 @@ cur_antigo.execute("""
 estatisticas = cur_antigo.fetchall()
 
 for row in estatisticas:
-    data_antiga, rodada, clube_nome, chutes, chutes_no_alvo, posse, passes, precisao, faltas, amarelo, vermelho, imped, escanteios = row
+    _, data_antiga, clube_nome, chutes, chutes_no_alvo, posse, passes, precisao, faltas, amarelo, vermelho, imped, escanteios = row
 
     # Pega pela correspondecia de data e nome do clube no banco novo
     cur_novo.execute("""
@@ -39,9 +39,22 @@ for row in estatisticas:
     """, (data_antiga,))
     resultado = cur_novo.fetchone()
     if resultado is None:
-        print(f"Clube não encontrado: {clube_nome}")
+        print(f"Nenhuma partida encontrada na data: {data_antiga}.")
         continue
-    clube_id = resultado[0]
+    partida_id = None
+    clube_id = None
+
+    for pid, mandante, visitante in resultado:
+        if (clube_nome in (mandante, visitante)):
+            partida_id = pid
+            # Pega o ID do clube
+            cur_novo.execute("SELECT ID from clubes WHERE clube = ?", (clube_nome,))
+            clube_id = cur_novo.fetchone()[0]
+            break
+
+        if partida_id is None:
+            print(f"Clube {clube_nome} não encontrado na data {data_antiga}.")
+            continue
 
     # Insere nas estatisticas normalizadas
     cur_novo.execute("""
