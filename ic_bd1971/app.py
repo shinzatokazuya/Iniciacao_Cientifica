@@ -8,7 +8,7 @@ from cs50 import SQL
 app = Flask(__name__)
 
 # Configura o banco de dados
-db = SQL("sqlite:///br_1971.db")
+db = SQL("sqlite:///ic_bd1971/bd/br_1971.db")
 
 # Carrega os clubes únicos para uso global
 CLUBES_QUERY = db.execute("SELECT clube FROM clubes")
