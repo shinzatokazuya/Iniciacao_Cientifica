@@ -22,6 +22,7 @@ cur_antigo.execute("""
            e.posse_de_bola, e.passes, e.precisao_passes, e.faltas,
            e.cartao_amarelo, e.cartao_vermelho, e.impedimentos, e.escanteios
     FROM Estatisticas e
+    JOIN Full f ON e.partida_id = f.ID
 """)
 estatisticas = cur_antigo.fetchall()
 
