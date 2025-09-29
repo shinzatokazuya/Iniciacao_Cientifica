@@ -1,7 +1,7 @@
 import sqlite3
 
 # Conecta com banco de dados
-con_antigo = sqlite3.connect("bd/teste_1971.db")
+con_antigo = sqlite3.connect("../backup_br_1971.db")
 cur_antigo = con_antigo.cursor()
 
 con_novo = sqlite3.connect("bd/dados_teste_1971.db")
