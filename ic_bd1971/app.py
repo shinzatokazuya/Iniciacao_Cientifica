@@ -8,7 +8,7 @@ import sqlite3
 app = Flask(__name__)
 
 # Configura o banco de dados
-db = sqlite3.connect("bd/teste_1971.db")
+db = sqlite3.connect("bd/dados_teste_1971.db")
 
 # Carrega os clubes únicos para uso global
 CLUBES_QUERY = db.execute("SELECT clube FROM clubes")
