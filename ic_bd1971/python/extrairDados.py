@@ -68,7 +68,7 @@ cur_novo.executescript("""
 
 
 
-    CREATE TABLE estatisticas_partida (
+    CREATE TABLE IF NOT EXISTS estatisticas_partida (
         partida_id INTEGER,
         clube_id INTEGER,
         chutes INTEGER,
