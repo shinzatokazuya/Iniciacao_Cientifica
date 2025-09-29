@@ -36,7 +36,7 @@ for row in cur_antigo.fetchall():
      mandante_placar, visitante_placar, visitante_id,
      mandante_penalti, visitante_penalti, prorrogacao) = row
 
-    ano = int(data[6:])
+    ano = int(data.split("/")[-1])
     edicao_id = edicoes_map[(campeonato_id, ano)]
 
     cur_novo.execute("""
