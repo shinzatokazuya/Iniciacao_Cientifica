@@ -3,12 +3,12 @@ import functools
 from flask import Flask, render_template, jsonify, request, redirect, g
 from collections import defaultdict
 from datetime import datetime
-from cs50 import SQL
+import sqlite3
 
 app = Flask(__name__)
 
 # Configura o banco de dados
-db = SQL("sqlite:///C:/Users/enryk/Documents/Estudos/Iniciacao_Cientifica/ic_bd1971/bd/teste_1971.db")
+db = sqlite3.connect("bd/teste_1971.db")
 
 # Carrega os clubes únicos para uso global
 CLUBES_QUERY = db.execute("SELECT clube FROM clubes")
