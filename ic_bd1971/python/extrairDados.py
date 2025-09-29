@@ -38,11 +38,20 @@ cur_novo.executescript("""
         FOREIGN KEY (campeonato_id) REFERENCES campeonatos(ID)
     );
 
+    CREATE TABLE IF NOT EXISTS estadios (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        estadio TEXT,
+        capacidade INTEGER,
+        local_id INTEGER,
+        FOREIGN KEY (local_id) REFERENCES locais(ID)
+    );
+
     CREATE TABLE IF NOT EXISTS partidas (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         edicao_id INTEGER,
         estadio_id INTEGER,
-        data_hora DATETIME,
+        data TEXT,
+        hora TEXT,
         fase TEXT,
         mandante_id INTEGER,
         visitante_id INTEGER,
@@ -57,13 +66,7 @@ cur_novo.executescript("""
         FOREIGN KEY (estadio_id) REFERENCES estadios(ID)
     );
 
-    CREATE TABLE IF NOT EXISTS estadios (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        estadio TEXT,
-        capacidade INTEGER,
-        local_id INTEGER,
-        FOREIGN KEY (local_id) REFERENCES locais(ID)
-    );
+
 
     CREATE TABLE estatisticas_partida (
         partida_id INTEGER,
@@ -113,14 +116,14 @@ clubes_antigos = cur_antigo.fetchall()
 # 3. Cria locais únicos no banco novo
 locais_map = {}
 for _, _, cidade, uf, regiao in clubes_antigos:
-    chave = (cidade, uf, regiao)
+    chave = (cidade, uf, regiao, "Brasil")
     if chave not in locais_map:
-        cur_novo.execute("INSERT INTO locais (cidade, UF, regiao) VALUES (?, ?, ?)", chave)
+        cur_novo.execute("INSERT INTO locais (cidade, UF, regiao, pais) VALUES (?, ?, ?, ?)", chave)
         locais_map[chave] = cur_novo.lastrowid
 
 # 4. Insere clubes no banco novo
 for id_clube, clube, cidade, uf, regiao in clubes_antigos:
-    local_id = locais_map[(cidade, uf, regiao)]
+    local_id = locais_map[(cidade, uf, regiao, "Brasil")]
     cur_novo.execute("INSERT INTO clubes (ID, clube, local_id) VALUES (?, ?, ?)", (id_clube, clube, local_id))
 
 # Salva e fecha
