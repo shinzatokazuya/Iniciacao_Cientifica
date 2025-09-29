@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="clube-info">
+    <h2>Jogos do {{ clube }}</h2>
+</div>
+
+<div class="jogos-container">
+    {% for ano, jogos in jogos_por_ano.items() %}
+        <div class="jogos-ano">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="4">Ano {{ ano }}</th>
+                    </tr>
+                    <tr>
+                        <th>Rodada</th>
+                        <th>Mandante</th>
+                        <th>Placar</th>
+                        <th>Visitante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jogo in jogos %}
+                    <tr>
+                        <td>{{ jogo["rodada"] }}</td>
+                        <td><a href="/clube/{{ jogo['mandante'] }}">{{ jogo["mandante"] }}</a></td>
+                        <td><strong><a href="/estatisticas/{{ jogo['ID'] }}">{{ jogo["mandante_Placar"] }} X {{ jogo["visitante_Placar"] }}</a></strong></td>
+                        <td><a href="/clube/{{ jogo['visitante'] }}">{{ jogo["visitante"] }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
