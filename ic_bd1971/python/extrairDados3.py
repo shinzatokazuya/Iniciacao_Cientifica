@@ -16,28 +16,6 @@ for (arena,) in arenas:
 
 con_novo.commit()
 
-# 1. Remover a tabela de estatísticas no banco novo e recriar
-cur_novo.execute("DROP TABLE IF EXISTS estatisticas_partida")
-
-cur_novo.execute("""
-    CREATE TABLE estatisticas_partida (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        data TEXT,
-        hora TEXT,
-        clube_nome TEXT,
-        chutes INTEGER,
-        chutes_no_alvo INTEGER,
-        posse TEXT,
-        passes INTEGER,
-        precisao TEXT,
-        faltas INTEGER,
-        amarelo INTEGER,
-        vermelho INTEGER,
-        impedimentos INTEGER,
-        escanteios INTEGER
-    )
-""")
-
 # 2. Migrar estatisticas (Estatisticas -> estatisticas_partida)
 cur_antigo.execute("""
     SELECT e.partida_id, f.data, e.clube, e.chutes, e.chutes_no_alvo,
