@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Partidas {{ ano }}</title>
+    <style>
+        table {
+            width: 48%;
+            border-collapse: collapse;
+            margin: 10px;
+            float: left;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <h1>Partidas do ano {{ ano }}</h1>
+    <div class="container">
+        <div>
+            <h2>Banco 1971</h2>
+            <table>
+                <tr>
+                    <th>Data</th><th>Hora</th><th>Mandante</th><th>Placar</th><th>Visitante</th>
+                </tr>
+                {% for p in partidas_1971 %}
+                <tr>
+                    <td>{{ p[1] }}</td>
+                    <td>{{ p[2] }}</td>
+                    <td>{{ p[3] }}</td>
+                    <td>{{ p[5] }} - {{ p[6] }}</td>
+                    <td>{{ p[4] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div>
+            <h2>Banco 2003</h2>
+            <table>
+                <tr>
+                    <th>Data</th><th>Hora</th><th>Mandante</th><th>Placar</th><th>Visitante</th>
+                </tr>
+                {% for p in partidas_2003 %}
+                <tr>
+                    <td>{{ p[1] }}</td>
+                    <td>{{ p[2] }}</td>
+                    <td>{{ p[3] }}</td>
+                    <td>{{ p[5] }} - {{ p[6] }}</td>
+                    <td>{{ p[4] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>
