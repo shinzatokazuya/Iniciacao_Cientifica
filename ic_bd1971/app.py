@@ -357,7 +357,7 @@ def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
     """ Calcula a classificação do campeonato até uma rodada específica ou a classificação final. """
     db = get_db()
 
-    if rodada_num is None or rodada_num = 0:
+    if rodada_num is None or rodada_num == 0:
         # Classificação final do ano
         where_clause = "WHERE ed.ano = ?"
         params = (ano,)
