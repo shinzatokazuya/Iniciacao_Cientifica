@@ -429,4 +429,4 @@ def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
         ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC
     """, params * 2).fetchall()  # Multiplica por 2 pois usamos where_clause em 2 CTEs
 
-    
+    return rankings
