@@ -152,14 +152,14 @@ def search():
         if rodada_param and rodada_param.isdigit():
             current_round = int(rodada_param)
             if current_round == 0:
-                classificacoes = get_classification_by_year_and_round(current_year, 0)
+                classificacoes = get_classificacao_por_ano_e_rodada(current_year, 0)
                 jogos = get_jogos_por_ano_e_rodada(current_year, None)
             else:
-                classificacoes = get_classification_by_year_and_round(current_year, current_round)
+                classificacoes = get_classificacao_por_ano_e_rodada(current_year, current_round)
                 jogos = get_jogos_por_ano_e_rodada(current_year, current_round)
         else:
             current_round = max_round
-            classificacoes = get_classification_by_year_and_round(current_year, current_round)
+            classificacoes = get_classificacao_por_ano_e_rodada(current_year, current_round)
             jogos = get_jogos_por_ano_e_rodada(current_year, current_round)
 
     return render_template("search.html",
@@ -229,7 +229,7 @@ def estatisticas(jogo_id):
 @app.route("/api/classificacao/<int:ano>/<int:rodada>")
 def api_classificacao(ano, rodada):
     """ Retorna a classificação para um dado ano e rodada. """
-    classificacoes = get_classification_by_year_and_round(ano, rodada)
+    classificacoes = get_classificacao_por_ano_e_rodada(ano, rodada)
     return jsonify([dict(row) for row in classificacoes])
 
 @app.route("/api/jogos/<int:ano>/<int:rodada>")
@@ -353,4 +353,80 @@ def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
 
     return jogos
 
-def get_classification_by_year_and_round
+def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
+    """ Calcula a classificação do campeonato até uma rodada específica ou a classificação final. """
+    db = get_db()
+
+    if rodada_num is None or rodada_num = 0:
+        # Classificação final do ano
+        where_clause = "WHERE ed.ano = ?"
+        params = (ano,)
+    else:
+        # Classificação até uma rodada específica
+        where_clause = "WHERE ed.ano = ? AND CAST(p.fase AS INTEGER) <= ?"
+        params = (ano, rodada_num)
+
+    rankings = db.execute(f"""
+        WITH jogos_mandante AS (
+            SELECT
+                c.clube,
+                p.mandante_placar AS gols_pro,
+                p.visitante_placar AS gols_sofrido,
+                CASE
+                    WHEN p.mandante_placar > p.visitante_placar THEN 3
+                    WHEN p.mandante_placar = p.visitante_placar THEN 1
+                    ELSE 0
+                END AS pontos,
+                CASE WHEN p.mandante_placar > p.visitante_placar THEN 1 ELSE 0 END AS vitorias,
+                CASE WHEN p.mandante_placar = p.visitante_placar THEN 1 ELSE 0 END AS empates,
+                CASE WHEN p.mandante_placar < p.visitante_placar THEN 1 ELSE 0 END AS derrotas
+            FROM partidas p
+            JOIN clubes c ON p.mandante_id = c.ID
+            JOIN edicoes ed ON p.edicao_id = ed.ID
+            {where_clause}
+        ),
+        jogos_visitante AS (
+            SELECT
+                c.clube,
+                p.visitante_placar AS gols_pro,
+                p.mandante_placar AS gols_sofrido,
+                CASE
+                    WHEN p.visitante_placar > p.mandante_placar THEN 3
+                    WHEN p.visitante_placar = p.mandante_placar THEN 1
+                    ELSE 0
+                END AS pontos,
+                CASE WHEN p.visitante_placar > p.mandante_placar THEN 1 ELSE 0 END AS vitorias,
+                CASE WHEN p.visitante_placar = p.mandante_placar THEN 1 ELSE 0 END AS empates,
+                CASE WHEN p.visitante_placar < p.mandante_placar THEN 1 ELSE 0 END AS derrotas
+            FROM partidas p
+            JOIN clubes c ON p.visitante_id = c.ID
+            JOIN edicoes ed ON p.edicao_id = ed.ID
+            {where_clause}
+        ),
+        todos_jogos AS (
+            SELECT * FROM jogos_mandante
+            UNION ALL
+            SELECT * FROM jogos_visitante
+        )
+        SELECT
+            ROW_NUMBER() OVER (
+                ORDER BY SUM(pontos) DESC,
+                         SUM(vitorias) DESC,
+                         (SUM(gols_pro) - SUM(gols_sofrido)) DESC,
+                         SUM(gols_pro) DESC
+            ) AS posicao,
+            clube,
+            COUNT(*) AS total_jogos,
+            SUM(pontos) AS pontos,
+            SUM(vitorias) AS vitorias,
+            SUM(empates) AS empates,
+            SUM(derrotas) AS derrotas,
+            SUM(gols_pro) AS gm,
+            SUM(gols_sofrido) AS gs,
+            (SUM(gols_pro) - SUM(gols_sofrido)) AS sg
+        FROM todos_jogos
+        GROUP BY clube
+        ORDER BY pontos DESC, vitorias DESC, sg DESC, gm DESC
+    """, params * 2).fetchall()  # Multiplica por 2 pois usamos where_clause em 2 CTEs
+
+    
