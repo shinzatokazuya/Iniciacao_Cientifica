@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Configurações
 DATABASE = "bd/dados_teste_1971.db"
-DATAS = list(range(1971, 2025))
+DATAS = list(range(1971, 2026))
 
 # ==================== DATABASE MANAGEMENT ====================
 
