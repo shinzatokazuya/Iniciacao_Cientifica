@@ -153,14 +153,14 @@ def search():
             current_round = int(rodada_param)
             if current_round == 0:
                 classificacoes = get_classification_by_year_and_round(current_year, 0)
-                jogos = get_jogos_by_year_and_round(current_year, None)
+                jogos = get_jogos_por_ano_e_rodada(current_year, None)
             else:
                 classificacoes = get_classification_by_year_and_round(current_year, current_round)
-                jogos = get_jogos_by_year_and_round(current_year, current_round)
+                jogos = get_jogos_por_ano_e_rodada(current_year, current_round)
         else:
             current_round = max_round
             classificacoes = get_classification_by_year_and_round(current_year, current_round)
-            jogos = get_jogos_by_year_and_round(current_year, current_round)
+            jogos = get_jogos_por_ano_e_rodada(current_year, current_round)
 
     return render_template("search.html",
                            classificacoes=classificacoes,
@@ -235,7 +235,7 @@ def api_classificacao(ano, rodada):
 @app.route("/api/jogos/<int:ano>/<int:rodada>")
 def api_jogos(ano, rodada):
     """ Retorna os jogos para um dado ano e rodada. """
-    jogos = get_jogos_by_year_and_round(ano, rodada if rodada != 0 else None)
+    jogos = get_jogos_por_ano_e_rodada(ano, rodada if rodada != 0 else None)
     return jsonify([dict(row) for row in jogos])
 
 @app.route("/api/max_rodada/<int:ano>")
@@ -306,4 +306,51 @@ def get_jogos_por_clube(nome):
 
     return jogos_clube, jogos_por_ano
 
-def get_jogos_by_year_and_round
+def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
+    """ Retorna os jogos de um ano e rodada específicos. """
+    db = get_db()
+
+    if rodada_num is None:
+        # Todos os jogos do ano
+        jogos = db.execute("""
+            SELECT
+                p.ID,
+                cm.clube AS mandante,
+                cv.clube AS visitante,
+                p.mandante_placar,
+                p.visitante_placar,
+                p.data,
+                p.fase AS rodada,
+                e_estadio.estadio AS arena
+            FROM partidas p
+            JOIN clubes cm ON p.mandante_id = cm.ID
+            JOIN clubes cv ON p.visitante_id = cv.ID
+            JOIN edicoes ed ON p.edicao_id = ed.ID
+            LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+            WHERE ed.ano = ?
+            ORDER BY p.data, p.fase
+        """, (ano,)).fetchall()
+    else:
+        # Jogos de uma rodada específica
+        jogos = db.execute("""
+            SELECT
+                p.ID,
+                cm.clube AS mandante,
+                cv.clube AS visitante,
+                p.mandante_placar,
+                p.visitante_placar,
+                p.data,
+                p.fase AS rodada,
+                e_estadio.estadio AS arena
+            FROM partidas p
+            JOIN clubes cm ON p.mandante_id = cm.ID
+            JOIN clubes cv ON p.visitante_id = cv.ID
+            JOIN edicoes ed ON p.edicao_id = ed.ID
+            LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+            WHERE ed.ano = ? AND p.fase = ?
+            ORDER BY p.data
+        """, (ano, str(rodada_num))).fetchall()
+
+    return jogos
+
+def get_classification_by_year_and_round
