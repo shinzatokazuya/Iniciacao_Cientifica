@@ -223,3 +223,45 @@ def estatisticas(jogo_id):
         cartoes=cartoes_jogo,
         confronto=confronto,
     )
+
+# ==================== API ROUTES ====================
+
+@app.route("/api/classificacao/<int:ano>/<int:rodada>")
+def api_classificacao(ano, rodada):
+    """ Retorna a classificação para um dado ano e rodada. """
+    classificacoes = get_classification_by_year_and_round(ano, rodada)
+    return jsonify([dict(row) for row in classificacoes])
+
+@app.route("/api/jogos/<int:ano>/<int:rodada>")
+def api_jogos(ano, rodada):
+    """ Retorna os jogos para um dado ano e rodada. """
+    jogos = get_jogos_by_year_and_round(ano, rodada if rodada != 0 else None)
+    return jsonify([dict(row) for row in jogos])
+
+@app.route("/api/max_rodada/<int:ano>")
+def api_max_rodada(ano):
+    """ Retorna o máximo de rodadas para um dado ano. """
+    db = get_db()
+
+    result = db.execute("""
+        SELECT MAX(CAST(p.fase AS INTEGER)) AS max_r
+        FROM partidas p
+        JOIN edicoes e ON p.edicao_id = e.ID
+        WHERE e.ano = ? AND p.fase NOT LIKE '%Final%'
+    """, (ano,)).fetchone()
+
+    if result and result['max_r'] is not None:
+        return jsonify(result['max_r'])
+
+    return jsonify(0)
+
+# ==================== HELPER FUNCTIONS ====================
+
+def get_jogos_por_clube(nome):
+    """ Retorna todos os jogos de um clube, separados por ano. """
+    db = get_db()
+
+    jogos_clubes = db.execute("""
+        SELECT
+            p.ID,
+            cm.clube AS mandante)
