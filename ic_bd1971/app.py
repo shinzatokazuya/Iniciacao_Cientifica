@@ -184,4 +184,18 @@ def estatisticas(jogo_id):
     db = get_db()
 
     # Buscar dados do confronto
-    confronto = db.execute(""")
+    confronto = db.execute("""
+        SELECT
+            p.ID,
+            cm.clube AS mandante,
+            cv.clube AS visitante,
+            p.mandante_placar AS gols_mandante,
+            p.visitante_placar AS gols_visitante,
+            p.data,
+            p.hora,
+            e_estadio.estadio AS arena,
+            p.fase AS rodada,
+            l.UF AS mandante_Estado,
+            ed.ano
+        FROM partidas p
+        JOIN clubes cm ON p.)
