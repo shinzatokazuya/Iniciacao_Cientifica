@@ -198,4 +198,28 @@ def estatisticas(jogo_id):
             l.UF AS mandante_Estado,
             ed.ano
         FROM partidas p
-        JOIN clubes cm ON p.)
+        JOIN clubes cm ON p.mandante_id = cm.ID
+        JOIN clubes cv ON p.visitante_id = cv.ID
+        JOIN edicoes ed ON p.edicao_id = ed.ID
+        LEFT JOIN estadios e_estadios ON p.estadio_id = e_estadio.ID
+        LEFT JOIN locais l ON cm.local_id = l.ID
+        WHERE p.ID = ?
+    """, (jogo_id)).fetchone()
+
+    if confronto:
+        confronto = dict(confronto)
+    else:
+        confronto = {}
+
+    # Como não temos AINDA dados de estatisticas, gols, jogadores e cartões
+    estatisticas_jogo = []
+    gols_jogo = []
+    cartoes_jogo = []
+
+    return render_template(
+        "estatisticas.html",
+        estatisticas=estatisticas_jogo,
+        gols=gols_jogo,
+        cartoes=cartoes_jogo,
+        confronto=confronto,
+    )
