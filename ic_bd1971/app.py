@@ -261,7 +261,38 @@ def get_jogos_por_clube(nome):
     """ Retorna todos os jogos de um clube, separados por ano. """
     db = get_db()
 
-    jogos_clubes = db.execute("""
+    jogos_clube = db.execute("""
         SELECT
             p.ID,
-            cm.clube AS mandante)
+            cm.clube AS mandante,
+            cv.clube AS visitante,
+            p.mandante_placar,
+            p.visitante_placar,
+            p.data,
+            p.fase AS rodada,
+            ed.ano,
+            e_estadio.estadio AS arena
+        FROM partidas p
+        JOIN clubes cm ON p.mandante_id = cm.ID
+        JOIN clubes cv ON p.visitante_id = cv.ID
+        JOIN edicoes ed ON p.edicao_id = ed.ID
+        LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+        WHERE cm.clube = ? OR cv.clube = ?
+        ORDER BY ed.ano DESC, p.data, p.fase
+    """, (nome, nome)).fetchall()
+
+    jogos_por_ano = {}
+    jogos_adicionados = set()
+
+    for jogo in jogos_clube:
+        jogo_dict = dict(jogo)
+        ano_jogo - jogo_dict['ano']
+        jogo_id = jogo_dict['ID']
+
+        if jogo_id in jogos_adicionados:
+            continue
+        jogos_adicionados.add(jogo_id)
+
+        if ano_jogo not in jogos_por_ano:
+            jogos_por_ano[ano_jogo] = []
+        jogos_por_ano[ano_jogo].append(jogo_dict)
