@@ -296,3 +296,14 @@ def get_jogos_por_clube(nome):
         if ano_jogo not in jogos_por_ano:
             jogos_por_ano[ano_jogo] = []
         jogos_por_ano[ano_jogo].append(jogo_dict)
+
+    # Ordena os anos de forma decrescente
+    jogos_por_ano = dict(sorted(jogos_por_ano.items(), reverse=true))
+
+    # Ordena cada ano por rodada
+    for ano in jogos_por_ano:
+        jogos_por_ano[ano] = sorted(jogos_por_ano[ano], key=lambda x: str(x["rodada"]))
+
+    return jogos_clube, jogos_por_ano
+
+def get_jogos_by_year_and_round
