@@ -179,4 +179,9 @@ def clube(nome):
     return render_template("clube.html", clube=nome, jogos_por_ano=jogos_por_ano)
 
 @app.route("/estatisticas/<int:jogos_id>")
+def estatisticas(jogo_id):
+    """ Página de estatísticas de uma partida. """
+    db = get_db()
 
+    # Buscar dados do confronto
+    confronto = db.execute(""")
