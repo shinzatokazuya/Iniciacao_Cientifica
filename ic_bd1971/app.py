@@ -141,7 +141,10 @@ def search():
             SELECT MAX(CAST(p.fase AS INTEGER)) AS max_r
             FROM partidas p
             JOIN edicoes e ON p.edicao_id = e.ID
-            WHERE e.ano = ? AND p.fase NOT LIKE '%Final%'
+            WHERE e.ano = ?
+                AND p.fase LIKE 'R%'
+                AND LENGTH(p.fase) > 1
+                AND SUBSTR(p.fase, 2) GLOB '[0-9]*'
         """, (current_year,)).fetchone()
 
         if max_round_result and max_round_result['max_r'] is not None:
