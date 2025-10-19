@@ -244,10 +244,13 @@ def api_max_rodada(ano):
     db = get_db()
 
     result = db.execute("""
-        SELECT MAX(CAST(p.fase AS INTEGER)) AS max_r
+        SELECT MAX(CAST(SUBSTR(p.fase, 2) AS INTEGER)) AS max_r
         FROM partidas p
         JOIN edicoes e ON p.edicao_id = e.ID
-        WHERE e.ano = ? AND p.fase NOT LIKE '%Final%'
+        WHERE e.ano = ?
+            AND p.fase LIKE 'R%'
+            AND LENGTH(p.fase) > 1
+            AND SUBSTR(p.fase, 2) GLOB '[0-9]*'
     """, (ano,)).fetchone()
 
     if result and result['max_r'] is not None:
