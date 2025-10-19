@@ -178,7 +178,7 @@ def clube(nome):
     jogos_clube, jogos_por_ano = get_jogos_por_clube(nome)
     return render_template("clube.html", clube=nome, jogos_por_ano=jogos_por_ano)
 
-@app.route("/estatisticas/<int:jogos_id>")
+@app.route("/estatisticas/<int:jogo_id>")
 def estatisticas(jogo_id):
     """ Página de estatísticas de uma partida. """
     db = get_db()
