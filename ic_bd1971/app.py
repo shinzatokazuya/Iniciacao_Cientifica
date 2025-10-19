@@ -286,7 +286,7 @@ def get_jogos_por_clube(nome):
 
     for jogo in jogos_clube:
         jogo_dict = dict(jogo)
-        ano_jogo - jogo_dict['ano']
+        ano_jogo = jogo_dict['ano']
         jogo_id = jogo_dict['ID']
 
         if jogo_id in jogos_adicionados:
@@ -298,7 +298,7 @@ def get_jogos_por_clube(nome):
         jogos_por_ano[ano_jogo].append(jogo_dict)
 
     # Ordena os anos de forma decrescente
-    jogos_por_ano = dict(sorted(jogos_por_ano.items(), reverse=true))
+    jogos_por_ano = dict(sorted(jogos_por_ano.items(), reverse=True))
 
     # Ordena cada ano por rodada
     for ano in jogos_por_ano:
