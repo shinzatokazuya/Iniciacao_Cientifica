@@ -1,0 +1,12 @@
+# Exportar para csv
+.mode csv
+.headers on
+.output arquivo_de_saida.csv
+SELECT * FROM sua_tabela;
+.output stdout
+
+
+# Fazer Backup
+.backup nome_arquivo.bd
+
+
