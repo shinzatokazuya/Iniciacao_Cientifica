@@ -201,7 +201,7 @@ def estatisticas(jogo_id):
         JOIN clubes cm ON p.mandante_id = cm.ID
         JOIN clubes cv ON p.visitante_id = cv.ID
         JOIN edicoes ed ON p.edicao_id = ed.ID
-        LEFT JOIN estadios e_estadios ON p.estadio_id = e_estadio.ID
+        LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
         LEFT JOIN locais l ON cm.local_id = l.ID
         WHERE p.ID = ?
     """, (jogo_id)).fetchone()
