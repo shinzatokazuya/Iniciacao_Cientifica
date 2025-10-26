@@ -376,7 +376,11 @@ def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
         params = (ano,)
     else:
         # Classificação até uma rodada específica
-        where_clause = "WHERE ed.ano = ? AND CAST(p.fase AS INTEGER) <= ?"
+        where_clause = """WHERE ed.ano = ?
+                        AND p.fase LIKE 'R%'
+                        AND LENGTH(p.fase) > 1
+                        AND SUBSTR(p.fase, 2) GLOB '[0-9]*'
+                        AND CAST(p.fase AS INTEGER) <= ?"""
         params = (ano, rodada_num)
 
     rankings = db.execute(f"""
