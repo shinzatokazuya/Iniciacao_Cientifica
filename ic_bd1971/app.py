@@ -282,7 +282,7 @@ def get_jogos_por_clube(nome):
         JOIN clubes cm ON p.mandante_id = cm.ID
         JOIN clubes cv ON p.visitante_id = cv.ID
         JOIN edicoes ed ON p.edicao_id = ed.ID
-        LEFT JOIN estadios est ON p.estadio_id = e_estadio.ID
+        LEFT JOIN estadios est ON p.estadio_id = est.ID
         WHERE cm.clube = ? OR cv.clube = ?
         ORDER BY ed.ano DESC, p.data, p.fase
     """, (nome, nome)).fetchall()
@@ -356,7 +356,7 @@ def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
             JOIN clubes cm ON p.mandante_id = cm.ID
             JOIN clubes cv ON p.visitante_id = cv.ID
             JOIN edicoes ed ON p.edicao_id = ed.ID
-            LEFT JOIN estadios est ON p.estadio_id = e_estadio.ID
+            LEFT JOIN estadios est ON p.estadio_id = est.ID
             WHERE ed.ano = ? AND p.fase = ?
             ORDER BY p.data
         """, (ano, fase_busca)).fetchall()
