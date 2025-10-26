@@ -57,22 +57,31 @@ CREATE TABLE edicoes (
 
 CREATE TABLE partidas (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    edicao_id INTEGER,
+    edicao_id INTEGER NOT NULL,
     estadio_id INTEGER,
-    data TEXT,
+    data TEXT NOT NULL,
     hora TEXT,
-    fase TEXT,
-    mandante_id INTEGER,
-    visitante_id INTEGER,
+    fase TEXT, -- 'Primeira Fase', 'Oitavas', 'Quartas', 'Semi', 'Final', etc.
+    rodada INTEGER,
+    mandante_id INTEGER NOT NULL,
+    visitante_id INTEGER NOT NULL,
     mandante_placar INTEGER,
     visitante_placar INTEGER,
     mandante_penalti INTEGER,
     visitante_penalti INTEGER,
-    prorrogacao INTEGER DEFAULT 0,
+    prorrogacao BOOLEAN DEFAULT 0,
+    publico INTEGER,
+    renda REAL,
+    arbitro TEXT,
+    arbitro_assistente1 TEXT,
+    arbitro_assistente2 TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (edicao_id) REFERENCES edicoes(ID),
+    FOREIGN KEY (estadio_id) REFERENCES estadios(ID),
     FOREIGN KEY (mandante_id) REFERENCES clubes(ID),
     FOREIGN KEY (visitante_id) REFERENCES clubes(ID),
-    FOREIGN KEY (edicao_id) REFERENCES edicoes(ID),
-    FOREIGN KEY (estadio_id) REFERENCES estadios(ID)
+    CHECK (mandante_id != visitante_id) -- Garante que time não joga contra si mesmo
 );
 
 CREATE TABLE estatisticas_partida (
@@ -95,11 +104,22 @@ CREATE TABLE estatisticas_partida (
 
 CREATE TABLE jogadores (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT,
-    nascimento DATE,
+    nome TEXT NOT NULL,
+    nome_completo TEXT,
+    nascimento TEXT,
+    falecimento TEXT, -- Para jogadores históricos já falecidos
     nacionalidade TEXT,
-    clube_id INTEGER,
-    FOREIGN KEY (clube_id) REFERENCES clubes(ID)
+    altura INTEGER, -- em centímetros
+    peso INTEGER, -- em quilogramas
+    posicao TEXT, -- 'Goleiro', 'Zagueiro', 'Lateral', 'Meia', 'Atacante'
+    posicao_detalhada TEXT, -- 'Zagueiro Central', 'Ponta Esquerda', etc.
+    pe_preferido TEXT, -- 'Direito', 'Esquerdo', 'Ambidestro'
+    clube_atual_id INTEGER,
+    aposentado BOOLEAN DEFAULT 0,
+    url_foto TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (clube_atual_id) REFERENCES clubes(ID)
 );
 
 CREATE TABLE jogadores_em_partida (
