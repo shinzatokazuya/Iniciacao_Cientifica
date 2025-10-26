@@ -277,12 +277,12 @@ def get_jogos_por_clube(nome):
             p.data,
             p.fase AS rodada,
             ed.ano,
-            e_estadio.estadio AS arena
+            est.estadio AS arena
         FROM partidas p
         JOIN clubes cm ON p.mandante_id = cm.ID
         JOIN clubes cv ON p.visitante_id = cv.ID
         JOIN edicoes ed ON p.edicao_id = ed.ID
-        LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+        LEFT JOIN estadios est ON p.estadio_id = e_estadio.ID
         WHERE cm.clube = ? OR cv.clube = ?
         ORDER BY ed.ano DESC, p.data, p.fase
     """, (nome, nome)).fetchall()
