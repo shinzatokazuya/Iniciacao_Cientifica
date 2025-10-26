@@ -382,7 +382,7 @@ def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
                         AND p.fase LIKE 'R%'
                         AND LENGTH(p.fase) > 1
                         AND SUBSTR(p.fase, 2) GLOB '[0-9]*'
-                        AND CAST(p.fase AS INTEGER) <= ?"""
+                        AND CAST(SUBSTR(p.fase, 2) AS INTEGER) <= ?"""
         params = (ano, rodada_num)
 
     rankings = db.execute(f"""
