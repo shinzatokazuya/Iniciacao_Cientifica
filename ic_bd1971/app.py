@@ -361,6 +361,8 @@ def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
             ORDER BY p.data
         """, (ano, fase_busca)).fetchall()
 
+        print(f"DEBUG: Encontrados {len(jogos)} jogos")
+
     return jogos
 
 def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
