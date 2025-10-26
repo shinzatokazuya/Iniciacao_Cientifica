@@ -2,36 +2,57 @@ CREATE TABLE locais (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     cidade TEXT,
     estado TEXT,
-    regiao TEXT
-);
-
-CREATE TABLE clubes (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT,
-    local_id INTEGER,
-    FOREIGN KEY (local_id) REFERENCES locais(ID)
-);
-
-CREATE TABLE campeonatos (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT,
+    regiao TEXT,
     pais TEXT,
-    entidade TEXT
-);
-
-CREATE TABLE edicoes (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    campeonato_id INTEGER,
-    ano INTEGER,
-    FOREIGN KEY (campeonato_id) REFERENCES campeonatos(ID)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE estadios (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT,
+    estadio TEXT NOT NULL,
     capacidade INTEGER,
-    local_id INTEGER,
+    local_id INTEGER NOT NULL,
+    inauguracao TEXT,
+    ativo BOOLEAN DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
     FOREIGN KEY (local_id) REFERENCES locais(ID)
+);
+
+CREATE TABLE clubes (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    clube TEXT NOT NULL,
+    local_id INTEGER NOT NULL,
+    fundacao TEXT,
+    estadio_principal_id INTEGER,
+    ativo BOOLEAN DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (local_id) REFERENCES locais(ID),
+    FOREIGN KEY (estadio_principal_id) REFERENCES estadios(ID)
+);
+
+CREATE TABLE campeonatos (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    campeonato TEXT NOT NULL,
+    pais TEXT NOT NULL,
+    entidade TEXT, -- CBF, CONMEBOL, FIFA, etc.
+    tipo TEXT, -- 'nacional', 'estadual', 'internacional'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE edicoes (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    campeonato_id INTEGER NOT NULL,
+    ano INTEGER NOT NULL,
+    data_inicio TEXT,
+    data_fim TEXT,
+    campeao_id INTEGER, -- clube vencedor
+    vice_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (campeonato_id) REFERENCES campeonatos(ID),
+    FOREIGN KEY (campeao_id) REFERENCES clubes(ID),
+    FOREIGN KEY (vice_id) REFERENCES clubes(ID)
 );
 
 CREATE TABLE partidas (
