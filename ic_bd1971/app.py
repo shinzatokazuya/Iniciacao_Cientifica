@@ -327,17 +327,21 @@ def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
                 p.visitante_placar,
                 p.data,
                 p.fase AS rodada,
-                e_estadio.estadio AS arena
+                est.estadio AS arena
             FROM partidas p
             JOIN clubes cm ON p.mandante_id = cm.ID
             JOIN clubes cv ON p.visitante_id = cv.ID
             JOIN edicoes ed ON p.edicao_id = ed.ID
-            LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+            LEFT JOIN estadios est ON p.estadio_id = est.ID
             WHERE ed.ano = ?
             ORDER BY p.data, p.fase
         """, (ano,)).fetchall()
     else:
         # Jogos de uma rodada específica
+        # IMPORTANTE: Monta a string da fase exatamente como está no banco (R1, R2, etc.)
+        fase_busca = f"R{rodada_num}"
+        print(f"DEBUG: Buscando jogos para ano={ano}, fase={fase_busca}")
+
         jogos = db.execute("""
             SELECT
                 p.ID,
@@ -347,15 +351,15 @@ def get_jogos_por_ano_e_rodada(ano, rodada_num=None):
                 p.visitante_placar,
                 p.data,
                 p.fase AS rodada,
-                e_estadio.estadio AS arena
+                est.estadio AS arena
             FROM partidas p
             JOIN clubes cm ON p.mandante_id = cm.ID
             JOIN clubes cv ON p.visitante_id = cv.ID
             JOIN edicoes ed ON p.edicao_id = ed.ID
-            LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
+            LEFT JOIN estadios est ON p.estadio_id = e_estadio.ID
             WHERE ed.ano = ? AND p.fase = ?
             ORDER BY p.data
-        """, (ano, str(rodada_num))).fetchall()
+        """, (ano, fase_busca)).fetchall()
 
     return jogos
 
@@ -365,7 +369,10 @@ def get_classificacao_por_ano_e_rodada(ano, rodada_num=None):
 
     if rodada_num is None or rodada_num == 0:
         # Classificação final do ano
-        where_clause = "WHERE ed.ano = ?"
+        where_clause = """WHERE ed.ano = ?
+                        AND p.fase LIKE 'R%'
+                        AND LENGTH(p.fase) > 1
+                        AND SUBSTR(p.fase, 2) GLOB '[0-9]*'"""
         params = (ano,)
     else:
         # Classificação até uma rodada específica
