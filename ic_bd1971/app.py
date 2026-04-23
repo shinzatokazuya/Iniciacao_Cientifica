@@ -207,7 +207,7 @@ def estatisticas(jogo_id):
         LEFT JOIN estadios e_estadio ON p.estadio_id = e_estadio.ID
         LEFT JOIN locais l ON cm.local_id = l.ID
         WHERE p.ID = ?
-    """, (jogo_id)).fetchone()
+    """, (jogo_id,)).fetchone()
 
     if confronto:
         confronto = dict(confronto)

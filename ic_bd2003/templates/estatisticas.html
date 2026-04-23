@@ -29,24 +29,44 @@
 
 <h3 class="section-title">Estatísticas</h3>
 <div class="stats-container">
-    {% for e in estatisticas %}
+
+    {% set estat_mandante = estatisticas | selectattr("clube", "equalto", confronto["mandante"]) | first %}
+    {% set estat_visitante = estatisticas | selectattr("clube", "equalto", confronto["visitante"]) | first %}
+
     <div class="stat-box">
-        <!--<h4>{{ e["clube"] }}</h4>!-->
+        <h4>{{ confronto["mandante"] }}</h4>
         <ul>
-            <li><strong>Chutes:</strong> {{ e["chutes"] }}</li>
-            <li><strong>No Alvo:</strong> {{ e["chutes_no_alvo"] }}</li>
-            <li><strong>Posse de Bola:</strong> {{ e["posse_de_bola"] }}</li>
-            <li><strong>Passes:</strong> {{ e["passes"] }}</li>
-            <li><strong>Precisão de passe:</strong> {{ e["precisao_passes"] }}</li>
-            <li><strong>Cartões amarelos:</strong> {{ e["cartao_amarelo"] }}</li>
-            <li><strong>Cartões vermelhos:</strong> {{ e["cartao_vermelho"] }}</li>
-            <li><strong>Impedimentos:</strong> {{ e["impedimentos"] }}</li>
-            <li><strong>Escanteios:</strong> {{ e["escanteios"] }}</li>
-            <li><strong>Faltas:</strong> {{ e["faltas"] }}</li>
+            <li><strong>Chutes:</strong> {{ estat_mandante["chutes"] }}</li>
+            <li><strong>No Alvo:</strong> {{ estat_mandante["chutes_no_alvo"] }}</li>
+            <li><strong>Posse de Bola:</strong> {{ estat_mandante["posse_de_bola"] }}</li>
+            <li><strong>Passes:</strong> {{ estat_mandante["passes"] }}</li>
+            <li><strong>Precisão Passes:</strong> {{ estat_mandante["precisao_passes"] }}</li>
+            <li><strong>Faltas:</strong> {{ estat_mandante["faltas"] }}</li>
+            <li><strong>Cartões Amarelos:</strong> {{ estat_mandante["cartao_amarelo"] }}</li>
+            <li><strong>Cartões Vermelhos:</strong> {{ estat_mandante["cartao_vermelho"] }}</li>
+            <li><strong>Impedimentos:</strong> {{ estat_mandante["impedimentos"] }}</li>
+            <li><strong>Escanteios:</strong> {{ estat_mandante["escanteios"] }}</li>
         </ul>
     </div>
-    {% endfor %}
+
+    <div class="stat-box">
+        <h4>{{ confronto["visitante"] }}</h4>
+        <ul>
+            <li><strong>Chutes:</strong> {{ estat_visitante["chutes"] }}</li>
+            <li><strong>No Alvo:</strong> {{ estat_visitante["chutes_no_alvo"] }}</li>
+            <li><strong>Posse de Bola:</strong> {{ estat_visitante["posse_de_bola"] }}</li>
+            <li><strong>Passes:</strong> {{ estat_visitante["passes"] }}</li>
+            <li><strong>Precisão Passes:</strong> {{ estat_visitante["precisao_passes"] }}</li>
+            <li><strong>Faltas:</strong> {{ estat_visitante["faltas"] }}</li>
+            <li><strong>Cartões Amarelos:</strong> {{ estat_visitante["cartao_amarelo"] }}</li>
+            <li><strong>Cartões Vermelhos:</strong> {{ estat_visitante["cartao_vermelho"] }}</li>
+            <li><strong>Impedimentos:</strong> {{ estat_visitante["impedimentos"] }}</li>
+            <li><strong>Escanteios:</strong> {{ estat_visitante["escanteios"] }}</li>
+        </ul>
+    </div>
+
 </div>
+
 
 <h3 class="section-title">Cartões</h3>
 <ul class="cards-list">
